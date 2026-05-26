@@ -14,14 +14,10 @@ import {
   Github,
   Figma,
   ArrowRight,
-  ShieldCheck,
+  Zap,
+  Flame,
+  Trophy,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,11 +43,57 @@ type AuditResult = {
   codexFixes: CodexFix[];
 };
 
-const sevColors: Record<Severity, string> = {
-  HIGH: "bg-red-500/15 text-red-400 border-red-500/30",
-  MEDIUM: "bg-amber-500/15 text-amber-400 border-amber-500/30",
-  LOW: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+const sevStyles: Record<Severity, { bg: string; text: string; dot: string; label: string }> = {
+  HIGH: { bg: "bg-[#FFE5E5]", text: "text-[#FF4B4B]", dot: "bg-[#FF4B4B]", label: "High risk" },
+  MEDIUM: { bg: "bg-[#FFF1D6]", text: "text-[#FF9600]", dot: "bg-[#FF9600]", label: "Medium" },
+  LOW: { bg: "bg-[#D9F0FE]", text: "text-[#1899D6]", dot: "bg-[#1CB0F6]", label: "Low" },
 };
+
+function Btn({
+  variant = "primary",
+  size = "md",
+  className = "",
+  children,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+  variant?: "primary" | "secondary" | "blue" | "danger";
+  size?: "sm" | "md" | "lg";
+}) {
+  const sizes = {
+    sm: "h-9 px-4 text-[12px] rounded-[10px]",
+    md: "h-12 px-6 text-[14px] rounded-[14px]",
+    lg: "h-14 px-7 text-[15px] rounded-[16px]",
+  };
+  const variants = {
+    primary:
+      "bg-[#58CC02] text-white border-2 border-[#58CC02] shadow-[0_4px_0_0_#46A302] hover:bg-[#4BB200]",
+    secondary:
+      "bg-white text-[#1CB0F6] border-2 border-[#E5E5E5] shadow-[0_4px_0_0_#E5E5E5] hover:bg-[#F7F7F7]",
+    blue:
+      "bg-[#1CB0F6] text-white border-2 border-[#1CB0F6] shadow-[0_4px_0_0_#1899D6] hover:bg-[#179fde]",
+    danger:
+      "bg-[#FF4B4B] text-white border-2 border-[#FF4B4B] shadow-[0_4px_0_0_#CC3C3C] hover:bg-[#ee3a3a]",
+  };
+  return (
+    <button
+      {...props}
+      className={`inline-flex items-center justify-center gap-2 font-extrabold uppercase tracking-[0.5px] transition-[transform,box-shadow,background-color] duration-100 active:translate-y-[4px] active:!shadow-[0_0_0_0_transparent] disabled:opacity-50 disabled:cursor-not-allowed disabled:!translate-y-0 ${sizes[size]} ${variants[variant]} ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-3 mb-6">
+      <span className="text-[11px] font-extrabold uppercase tracking-[2px] text-[#AFAFAF]">
+        {children}
+      </span>
+      <span className="flex-1 h-px bg-[#E5E5E5]" />
+    </div>
+  );
+}
 
 function Index() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -61,6 +103,7 @@ function Index() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<AuditResult | null>(null);
+  const [tab, setTab] = useState<"screenshot" | "url">("screenshot");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const onFile = useCallback((file: File) => {
@@ -93,7 +136,7 @@ function Index() {
       if (data?.error) throw new Error(data.error);
       setProgress(100);
       setResult(data);
-      toast.success("Audit complete");
+      toast.success("Audit complete!");
       setTimeout(() => {
         document.getElementById("results")?.scrollIntoView({ behavior: "smooth" });
       }, 100);
@@ -109,337 +152,415 @@ function Index() {
     if (!imageBase64) return toast.error("Upload a screenshot first");
     runAudit({ imageBase64 });
   };
-
   const handleUrlAudit = () => {
     if (!url.trim()) return toast.error("Enter a URL");
     runAudit({ url });
   };
 
   return (
-    <div className="min-h-dvh bg-[#0a0a14] text-slate-100 selection:bg-cyan-500/30">
-      <Toaster theme="dark" />
-      {/* glow bg */}
-      <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-[1200px] bg-gradient-to-br from-cyan-500/20 via-violet-500/10 to-transparent blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-[400px] w-[600px] bg-emerald-500/10 blur-3xl" />
-      </div>
+    <div className="min-h-dvh bg-white text-[#3C3C3C]">
+      <Toaster />
 
-      {/* Nav */}
-      <header className="border-b border-white/5 backdrop-blur-sm sticky top-0 z-40 bg-[#0a0a14]/70">
-        <nav className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <Shield className="h-7 w-7 text-cyan-400" />
-              <div className="absolute inset-0 blur-md bg-cyan-400/40 -z-10" />
-            </div>
-            <span className="font-bold text-lg tracking-tight">
-              Shield<span className="text-cyan-400">UX</span>
+      {/* NAVBAR */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b-2 border-[#E5E5E5]">
+        <nav className="mx-auto max-w-[1280px] h-16 px-6 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <a href="#" className="flex items-center gap-2">
+              <div className="relative h-9 w-9 rounded-xl bg-[#58CC02] grid place-items-center shadow-[0_3px_0_0_#46A302]">
+                <Shield className="h-5 w-5 text-white" strokeWidth={3} />
+              </div>
+              <span className="font-display text-[24px] font-bold text-[#0F1635] leading-none">
+                ShieldUX
+              </span>
+            </a>
+            <span className="hidden md:block h-6 w-px bg-[#E5E5E5]" />
+            <span className="hidden md:block text-[10px] font-extrabold uppercase tracking-[1.5px] text-[#AFAFAF]">
+              AI Audit Suite
             </span>
           </div>
-          <div className="hidden md:flex items-center gap-6 text-sm text-slate-400">
-            <a href="#features" className="hover:text-white">Features</a>
-            <a href="#audit" className="hover:text-white">Audit</a>
-            <a href="#how" className="hover:text-white">How it works</a>
-          </div>
-          <Button
-            onClick={() => document.getElementById("audit")?.scrollIntoView({ behavior: "smooth" })}
-            className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold"
-          >
-            Run Audit <ArrowRight className="ml-1 h-4 w-4" />
-          </Button>
-        </nav>
-      </header>
 
-      {/* Hero */}
-      <section className="mx-auto max-w-7xl px-6 pt-20 pb-16 text-center">
-        <Badge variant="outline" className="border-cyan-500/30 text-cyan-300 bg-cyan-500/10 mb-6">
-          <Sparkles className="h-3 w-3 mr-1" /> AI Product Security & UX Auditor
-        </Badge>
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent">
-          Ship safer, smarter
-          <br />
-          digital products.
-        </h1>
-        <p className="mt-6 text-lg text-slate-400 max-w-2xl mx-auto">
-          ShieldUX audits your product across UX, accessibility, privacy, frontend quality, and
-          security — and generates actionable fixes powered by multi-agent AI.
-        </p>
-        <div className="mt-8 flex gap-3 justify-center">
-          <Button
-            size="lg"
-            onClick={() => document.getElementById("audit")?.scrollIntoView({ behavior: "smooth" })}
-            className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold"
-          >
-            Audit a screenshot <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="border-white/20 bg-white/5 hover:bg-white/10 text-white"
-            onClick={() => document.getElementById("how")?.scrollIntoView({ behavior: "smooth" })}
-          >
-            How it works
-          </Button>
-        </div>
-
-        {/* Agent chips */}
-        <div className="mt-12 flex flex-wrap justify-center gap-3">
-          {[
-            { icon: Eye, label: "UX Auditor", color: "text-violet-300 bg-violet-500/10 border-violet-500/30" },
-            { icon: ShieldCheck, label: "Accessibility", color: "text-emerald-300 bg-emerald-500/10 border-emerald-500/30" },
-            { icon: Lock, label: "Security", color: "text-rose-300 bg-rose-500/10 border-rose-500/30" },
-            { icon: Code2, label: "Codex Fixes", color: "text-cyan-300 bg-cyan-500/10 border-cyan-500/30" },
-          ].map((a) => (
-            <div
-              key={a.label}
-              className={`px-4 py-2 rounded-full border text-sm flex items-center gap-2 ${a.color}`}
-            >
-              <a.icon className="h-4 w-4" /> {a.label}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Features */}
-      <section id="features" className="mx-auto max-w-7xl px-6 py-16">
-        <div className="grid md:grid-cols-3 gap-4">
-          {[
-            {
-              icon: Eye,
-              title: "Multimodal vision",
-              desc: "Upload a screenshot and our agents read the UI — buttons, contrast, hierarchy, trust signals.",
-            },
-            {
-              icon: Lock,
-              title: "Security reasoning",
-              desc: "Detects insecure auth UX, missing MFA, weak password flows, and privacy leak patterns.",
-            },
-            {
-              icon: Code2,
-              title: "Codex-powered fixes",
-              desc: "Get ready-to-paste React + Tailwind snippets with explanations, not just generic advice.",
-            },
-          ].map((f) => (
-            <Card
-              key={f.title}
-              className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/[0.07] transition-colors"
-            >
-              <CardHeader>
-                <div className="h-10 w-10 rounded-lg bg-cyan-500/15 border border-cyan-500/30 grid place-items-center mb-2">
-                  <f.icon className="h-5 w-5 text-cyan-400" />
-                </div>
-                <CardTitle className="text-white">{f.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-slate-400">{f.desc}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* Audit Console */}
-      <section id="audit" className="mx-auto max-w-5xl px-6 py-12">
-        <Card className="bg-gradient-to-b from-white/[0.06] to-white/[0.02] border-white/10 backdrop-blur-sm">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-cyan-400" />
-              <CardTitle className="text-white">Run an audit</CardTitle>
-            </div>
-            <p className="text-sm text-slate-400">
-              Upload a screenshot or paste a URL. Our agent pipeline takes ~15 seconds.
-            </p>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="screenshot">
-              <TabsList className="bg-white/5 border border-white/10">
-                <TabsTrigger value="screenshot" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-black">
-                  <Upload className="h-4 w-4 mr-1" /> Screenshot
-                </TabsTrigger>
-                <TabsTrigger value="url" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-black">
-                  <LinkIcon className="h-4 w-4 mr-1" /> URL
-                </TabsTrigger>
-                <TabsTrigger value="repo" disabled>
-                  <Github className="h-4 w-4 mr-1" /> Repo
-                  <Badge className="ml-2 bg-white/10 text-slate-300 text-[10px]">Soon</Badge>
-                </TabsTrigger>
-                <TabsTrigger value="figma" disabled>
-                  <Figma className="h-4 w-4 mr-1" /> Figma
-                  <Badge className="ml-2 bg-white/10 text-slate-300 text-[10px]">Soon</Badge>
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="screenshot" className="mt-4">
-                <div
-                  onClick={() => fileRef.current?.click()}
-                  onDragOver={(e) => e.preventDefault()}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    const f = e.dataTransfer.files?.[0];
-                    if (f) onFile(f);
-                  }}
-                  className="cursor-pointer rounded-xl border-2 border-dashed border-white/15 hover:border-cyan-400/50 bg-black/20 p-8 transition-colors"
-                >
-                  {imagePreview ? (
-                    <div className="flex flex-col items-center gap-3">
-                      <img
-                        src={imagePreview}
-                        alt="Uploaded screenshot preview"
-                        className="max-h-64 rounded-lg border border-white/10"
-                      />
-                      <p className="text-xs text-slate-400">Click or drop to replace</p>
-                    </div>
-                  ) : (
-                    <div className="text-center">
-                      <Upload className="h-10 w-10 text-cyan-400 mx-auto mb-3" />
-                      <p className="text-white font-medium">Drop a screenshot here</p>
-                      <p className="text-sm text-slate-400 mt-1">PNG, JPG, or WebP — login screens, dashboards, forms</p>
-                    </div>
-                  )}
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
-                  />
-                </div>
-                <Button
-                  onClick={handleScreenshotAudit}
-                  disabled={loading || !imageBase64}
-                  className="mt-4 w-full bg-cyan-500 hover:bg-cyan-400 text-black font-semibold"
-                  size="lg"
-                >
-                  {loading ? (
-                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Running agent pipeline…</>
-                  ) : (
-                    <>Run ShieldUX audit <Sparkles className="ml-2 h-4 w-4" /></>
-                  )}
-                </Button>
-              </TabsContent>
-
-              <TabsContent value="url" className="mt-4">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="https://example.com/login"
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                    className="bg-black/30 border-white/15 text-white"
-                  />
-                  <Button
-                    onClick={handleUrlAudit}
-                    disabled={loading}
-                    className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold"
-                  >
-                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Audit"}
-                  </Button>
-                </div>
-                <p className="text-xs text-slate-500 mt-2">
-                  URL audits analyze patterns based on common product flows. Screenshot uploads give richer multimodal results.
-                </p>
-              </TabsContent>
-            </Tabs>
-
-            {loading && (
-              <div className="mt-6">
-                <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="h-3 w-3 animate-spin text-cyan-400" />
-                    Agents auditing UX → Accessibility → Security → Codex
-                  </span>
-                  <span>{Math.round(progress)}%</span>
-                </div>
-                <Progress value={progress} className="bg-white/10" />
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* Results */}
-      {result && (
-        <section id="results" className="mx-auto max-w-6xl px-6 py-12">
-          <div className="grid md:grid-cols-3 gap-4 mb-6">
-            <Card className="bg-gradient-to-br from-cyan-500/20 to-transparent border-cyan-500/30 md:col-span-1">
-              <CardHeader>
-                <CardTitle className="text-sm font-medium text-slate-300">Trust Score</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-6xl font-bold text-white">
-                  {result.trustScore}
-                  <span className="text-2xl text-slate-400">/100</span>
-                </div>
-                <Progress value={result.trustScore} className="mt-3 bg-white/10" />
-              </CardContent>
-            </Card>
-            <Card className="bg-white/5 border-white/10 md:col-span-2">
-              <CardHeader>
-                <CardTitle className="text-sm font-medium text-slate-300 flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-cyan-400" /> Executive Summary
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-slate-200 leading-relaxed">{result.summary}</p>
-                <div className="flex gap-3 mt-4">
-                  {(["HIGH", "MEDIUM", "LOW"] as Severity[]).map((s) => {
-                    const count = result.findings.filter((f) => f.severity === s).length;
-                    return (
-                      <Badge key={s} className={`${sevColors[s]} border`}>
-                        {count} {s}
-                      </Badge>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-amber-400" /> Findings
-          </h2>
-          <div className="grid md:grid-cols-2 gap-4 mb-10">
-            {result.findings.map((f) => (
-              <Card key={f.id} className="bg-white/5 border-white/10 hover:bg-white/[0.07] transition-colors">
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-2">
-                    <CardTitle className="text-base text-white">{f.title}</CardTitle>
-                    <Badge className={`${sevColors[f.severity]} border shrink-0`}>{f.severity}</Badge>
-                  </div>
-                  <Badge variant="outline" className="w-fit border-white/15 text-slate-400">
-                    {f.category}
-                  </Badge>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <p className="text-sm text-slate-300">{f.description}</p>
-                  <div className="rounded-md bg-emerald-500/10 border border-emerald-500/20 p-3">
-                    <p className="text-xs text-emerald-300 font-semibold mb-1 flex items-center gap-1">
-                      <CheckCircle2 className="h-3 w-3" /> Recommendation
-                    </p>
-                    <p className="text-sm text-slate-200">{f.recommendation}</p>
-                  </div>
-                </CardContent>
-              </Card>
+          <div className="hidden md:flex items-center gap-1">
+            {["Audit", "Agents", "Findings", "Codex"].map((l) => (
+              <a
+                key={l}
+                href={`#${l.toLowerCase()}`}
+                className="px-3 py-2 rounded-lg text-[13px] font-bold uppercase tracking-[0.5px] text-[#AFAFAF] hover:text-[#58CC02] hover:bg-[#EAF8DC] transition-colors"
+              >
+                {l}
+              </a>
             ))}
           </div>
 
+          <Btn
+            size="sm"
+            onClick={() => document.getElementById("audit")?.scrollIntoView({ behavior: "smooth" })}
+          >
+            <Zap className="h-3.5 w-3.5" strokeWidth={3} />
+            Run Audit
+          </Btn>
+        </nav>
+      </header>
+
+      {/* HERO */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#EAF8DC] via-white to-white">
+        <div className="absolute inset-0 -z-0 opacity-40">
+          <div className="absolute top-10 left-1/4 h-72 w-72 rounded-full bg-[#58CC02]/20 blur-3xl" />
+          <div className="absolute top-32 right-1/4 h-72 w-72 rounded-full bg-[#1CB0F6]/20 blur-3xl" />
+        </div>
+        <div className="relative mx-auto max-w-[1100px] px-6 pt-20 pb-24 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border-2 border-[#E5E5E5] shadow-[0_3px_0_0_#E5E5E5] mb-8">
+            <Sparkles className="h-3.5 w-3.5 text-[#FFC800]" fill="#FFC800" />
+            <span className="text-[11px] font-extrabold uppercase tracking-[1px] text-[#3C3C3C]">
+              4 AI Agents · Multimodal · Codex-powered
+            </span>
+          </div>
+
+          <h1 className="font-display text-[44px] md:text-[72px] leading-[0.95] text-[#0F1635]">
+            ship products that
+            <br />
+            <span className="text-[#58CC02]">people trust.</span>
+          </h1>
+
+          <p className="mt-6 text-[17px] md:text-[19px] text-[#777] max-w-[600px] mx-auto leading-relaxed">
+            ShieldUX audits your UI for{" "}
+            <span className="font-bold text-[#3C3C3C]">security, accessibility, privacy and UX</span>{" "}
+            issues — then writes the code to fix them. Drop a screenshot. Get a trust score in 15 seconds.
+          </p>
+
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Btn
+              size="lg"
+              onClick={() => document.getElementById("audit")?.scrollIntoView({ behavior: "smooth" })}
+            >
+              Audit my product <ArrowRight className="h-4 w-4" strokeWidth={3} />
+            </Btn>
+            <Btn
+              size="lg"
+              variant="secondary"
+              onClick={() => document.getElementById("how")?.scrollIntoView({ behavior: "smooth" })}
+            >
+              How it works
+            </Btn>
+          </div>
+
+          {/* Stats strip */}
+          <div className="mt-16 grid grid-cols-3 gap-3 max-w-[680px] mx-auto">
+            {[
+              { icon: Trophy, value: "92", label: "Avg trust score", color: "#58CC02" },
+              { icon: Flame, value: "47", label: "Issues per audit", color: "#FF9600" },
+              { icon: Zap, value: "15s", label: "Pipeline time", color: "#1CB0F6" },
+            ].map((s) => (
+              <div
+                key={s.label}
+                className="card-chunky px-4 py-5 hover:card-chunky-hover"
+              >
+                <s.icon className="h-5 w-5 mx-auto mb-2" style={{ color: s.color }} strokeWidth={2.5} />
+                <div className="font-display text-[28px] leading-none text-[#0F1635]">{s.value}</div>
+                <div className="mt-1 text-[10px] font-extrabold uppercase tracking-[1px] text-[#AFAFAF]">
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AGENTS */}
+      <section id="agents" className="mx-auto max-w-[1280px] px-6 py-20">
+        <SectionLabel>The agent team</SectionLabel>
+        <h2 className="font-display text-[36px] md:text-[48px] text-[#0F1635] mb-3">
+          Four specialists. <span className="text-[#58CC02]">One verdict.</span>
+        </h2>
+        <p className="text-[16px] text-[#777] mb-12 max-w-xl">
+          Each agent runs in parallel, then a coordinator reconciles findings into a single trust score.
+        </p>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[
+            { icon: Eye, name: "UX Auditor", desc: "Reads hierarchy, trust signals, CTA clarity, friction points.", color: "#58CC02", bg: "#EAF8DC" },
+            { icon: CheckCircle2, name: "Accessibility", desc: "Contrast, focus order, semantic structure, WCAG checks.", color: "#1CB0F6", bg: "#D9F0FE" },
+            { icon: Lock, name: "Security", desc: "Auth UX, leaked data, missing MFA, weak password flows.", color: "#FF4B4B", bg: "#FFE5E5" },
+            { icon: Code2, name: "Codex Fixer", desc: "Writes ready-to-paste React + Tailwind patches.", color: "#FFC800", bg: "#FFF6D6" },
+          ].map((a) => (
+            <div
+              key={a.name}
+              className="card-chunky p-5 hover:card-chunky-hover group"
+            >
+              <div
+                className="h-12 w-12 rounded-2xl grid place-items-center mb-4 transition-transform group-hover:scale-110"
+                style={{ background: a.bg }}
+              >
+                <a.icon className="h-6 w-6" style={{ color: a.color }} strokeWidth={2.5} />
+              </div>
+              <h3 className="font-display text-[22px] text-[#0F1635] mb-2">{a.name}</h3>
+              <p className="text-[14px] text-[#777] leading-relaxed">{a.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* AUDIT CONSOLE */}
+      <section id="audit" className="bg-[#FAFAF7] border-y-2 border-[#E5E5E5]">
+        <div className="mx-auto max-w-[920px] px-6 py-20">
+          <SectionLabel>Audit workspace</SectionLabel>
+          <h2 className="font-display text-[36px] md:text-[48px] text-[#0F1635] mb-3">
+            Drop it. <span className="text-[#1CB0F6]">Ship it.</span>
+          </h2>
+          <p className="text-[16px] text-[#777] mb-10 max-w-lg">
+            Upload a screenshot of any login screen, dashboard or checkout. Get a full audit in seconds.
+          </p>
+
+          <div className="card-chunky overflow-hidden">
+            {/* Tabs */}
+            <div className="flex border-b-2 border-[#E5E5E5] bg-white">
+              {[
+                { id: "screenshot", icon: Upload, label: "Screenshot" },
+                { id: "url", icon: LinkIcon, label: "URL" },
+                { id: "repo", icon: Github, label: "Repo", soon: true },
+                { id: "figma", icon: Figma, label: "Figma", soon: true },
+              ].map((t) => {
+                const active = tab === t.id;
+                const disabled = t.soon;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => !disabled && setTab(t.id as any)}
+                    disabled={disabled}
+                    className={`flex-1 flex items-center justify-center gap-2 py-4 text-[12px] font-extrabold uppercase tracking-[0.5px] border-b-[3px] transition-colors ${
+                      active
+                        ? "border-[#58CC02] text-[#58CC02] bg-[#EAF8DC]/40"
+                        : "border-transparent text-[#AFAFAF] hover:text-[#3C3C3C]"
+                    } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                  >
+                    <t.icon className="h-4 w-4" strokeWidth={2.5} />
+                    {t.label}
+                    {t.soon && (
+                      <span className="ml-1 text-[9px] px-1.5 py-0.5 rounded-full bg-[#FFF6D6] text-[#B8920F]">
+                        SOON
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="p-6 sm:p-8 bg-white">
+              {tab === "screenshot" && (
+                <>
+                  <div
+                    onClick={() => fileRef.current?.click()}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const f = e.dataTransfer.files?.[0];
+                      if (f) onFile(f);
+                    }}
+                    className="cursor-pointer rounded-2xl border-[3px] border-dashed border-[#E5E5E5] hover:border-[#58CC02] hover:bg-[#EAF8DC]/40 bg-[#FAFAF7] p-10 transition-colors"
+                  >
+                    {imagePreview ? (
+                      <div className="flex flex-col items-center gap-3">
+                        <img
+                          src={imagePreview}
+                          alt="Uploaded screenshot preview"
+                          className="max-h-64 rounded-xl border-2 border-[#E5E5E5]"
+                        />
+                        <p className="text-[12px] font-bold uppercase tracking-[1px] text-[#AFAFAF]">
+                          Click or drop to replace
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <div className="h-16 w-16 rounded-2xl bg-[#58CC02] grid place-items-center mx-auto mb-4 shadow-[0_4px_0_0_#46A302]">
+                          <Upload className="h-7 w-7 text-white" strokeWidth={3} />
+                        </div>
+                        <p className="font-display text-[22px] text-[#0F1635]">Drop a screenshot</p>
+                        <p className="text-[13px] text-[#777] mt-1">
+                          PNG · JPG · WebP — login flows, dashboards, forms
+                        </p>
+                      </div>
+                    )}
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])}
+                    />
+                  </div>
+                  <Btn
+                    size="lg"
+                    className="mt-6 w-full"
+                    onClick={handleScreenshotAudit}
+                    disabled={loading || !imageBase64}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" strokeWidth={3} />
+                        Agents auditing…
+                      </>
+                    ) : (
+                      <>
+                        Run audit
+                        <Sparkles className="h-4 w-4" strokeWidth={3} />
+                      </>
+                    )}
+                  </Btn>
+                </>
+              )}
+
+              {tab === "url" && (
+                <>
+                  <label className="text-[10px] font-extrabold uppercase tracking-[1px] text-[#AFAFAF] block mb-2">
+                    Page URL
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <input
+                      type="url"
+                      value={url}
+                      onChange={(e) => setUrl(e.target.value)}
+                      placeholder="https://example.com/login"
+                      className="flex-1 h-12 px-4 rounded-[14px] border-2 border-[#E5E5E5] focus:border-[#1CB0F6] outline-none text-[15px] font-semibold text-[#3C3C3C] placeholder:text-[#AFAFAF] placeholder:font-medium transition-colors"
+                    />
+                    <Btn variant="blue" onClick={handleUrlAudit} disabled={loading}>
+                      {loading ? <Loader2 className="h-4 w-4 animate-spin" strokeWidth={3} /> : "Audit"}
+                    </Btn>
+                  </div>
+                  <p className="text-[12px] text-[#AFAFAF] mt-3">
+                    Screenshots give richer multimodal results than URLs.
+                  </p>
+                </>
+              )}
+
+              {loading && (
+                <div className="mt-6">
+                  <div className="flex items-center justify-between text-[11px] font-extrabold uppercase tracking-[1px] text-[#AFAFAF] mb-2">
+                    <span>UX → Accessibility → Security → Codex</span>
+                    <span className="text-[#58CC02]">{Math.round(progress)}%</span>
+                  </div>
+                  <div className="h-3 rounded-full bg-[#E5E5E5] overflow-hidden">
+                    <div
+                      className="h-full bg-[#58CC02] rounded-full transition-[width] duration-300"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* RESULTS */}
+      {result && (
+        <section id="results" className="mx-auto max-w-[1100px] px-6 py-20">
+          <SectionLabel>Audit results</SectionLabel>
+
+          <div className="grid md:grid-cols-3 gap-5 mb-10">
+            {/* Trust Score */}
+            <div className="card-chunky p-7 md:col-span-1 bg-gradient-to-br from-[#EAF8DC] to-white">
+              <div className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-[#AFAFAF] mb-3">
+                Trust Score
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="font-display text-[72px] leading-none text-[#58CC02]">
+                  {result.trustScore}
+                </span>
+                <span className="font-display text-[24px] text-[#AFAFAF]">/100</span>
+              </div>
+              <div className="mt-4 h-3 rounded-full bg-[#E5E5E5] overflow-hidden">
+                <div
+                  className="h-full bg-[#58CC02] rounded-full transition-[width] duration-700"
+                  style={{ width: `${result.trustScore}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="card-chunky p-7 md:col-span-2">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="h-4 w-4 text-[#FFC800]" fill="#FFC800" />
+                <span className="text-[10px] font-extrabold uppercase tracking-[1.5px] text-[#AFAFAF]">
+                  Executive summary
+                </span>
+              </div>
+              <p className="text-[15px] text-[#3C3C3C] leading-relaxed">{result.summary}</p>
+              <div className="flex flex-wrap gap-2 mt-5">
+                {(["HIGH", "MEDIUM", "LOW"] as Severity[]).map((s) => {
+                  const count = result.findings.filter((f) => f.severity === s).length;
+                  const st = sevStyles[s];
+                  return (
+                    <span
+                      key={s}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ${st.bg} ${st.text} text-[11px] font-extrabold uppercase tracking-[0.5px]`}
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
+                      {count} {s}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Findings */}
+          <h3 id="findings" className="font-display text-[28px] text-[#0F1635] mb-5 flex items-center gap-2">
+            <AlertTriangle className="h-6 w-6 text-[#FF9600]" strokeWidth={2.5} />
+            Findings
+          </h3>
+          <div className="grid md:grid-cols-2 gap-5 mb-12">
+            {result.findings.map((f) => {
+              const st = sevStyles[f.severity];
+              return (
+                <div key={f.id} className="card-chunky p-6 hover:card-chunky-hover">
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <h4 className="font-display text-[20px] text-[#0F1635] leading-tight">
+                      {f.title}
+                    </h4>
+                    <span
+                      className={`shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${st.bg} ${st.text} text-[10px] font-extrabold uppercase tracking-[0.5px]`}
+                    >
+                      <span className={`h-1.5 w-1.5 rounded-full ${st.dot}`} />
+                      {f.severity}
+                    </span>
+                  </div>
+                  <span className="inline-block text-[10px] font-extrabold uppercase tracking-[1px] text-[#AFAFAF] mb-3">
+                    {f.category}
+                  </span>
+                  <p className="text-[14px] text-[#777] leading-relaxed mb-4">{f.description}</p>
+                  <div className="rounded-xl bg-[#EAF8DC] border-2 border-[#58CC02]/30 p-3">
+                    <div className="flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[1px] text-[#46A302] mb-1">
+                      <CheckCircle2 className="h-3 w-3" strokeWidth={3} /> Fix
+                    </div>
+                    <p className="text-[13px] text-[#3C3C3C]">{f.recommendation}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Codex */}
           {result.codexFixes?.length > 0 && (
             <>
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-                <Code2 className="h-5 w-5 text-cyan-400" /> Codex Fixes
-              </h2>
-              <div className="space-y-4">
+              <h3 id="codex" className="font-display text-[28px] text-[#0F1635] mb-5 flex items-center gap-2">
+                <Code2 className="h-6 w-6 text-[#1CB0F6]" strokeWidth={2.5} />
+                Codex Fixes
+              </h3>
+              <div className="space-y-5">
                 {result.codexFixes.map((fix, i) => (
-                  <Card key={i} className="bg-black/40 border-white/10">
-                    <CardHeader>
-                      <CardTitle className="text-white text-base">{fix.title}</CardTitle>
-                      <p className="text-sm text-slate-400">{fix.explanation}</p>
-                    </CardHeader>
-                    <CardContent>
-                      <pre className="bg-black/60 border border-white/10 rounded-lg p-4 overflow-x-auto text-xs text-cyan-100">
-                        <code>{fix.code}</code>
-                      </pre>
-                    </CardContent>
-                  </Card>
+                  <div key={i} className="card-chunky overflow-hidden">
+                    <div className="p-5 border-b-2 border-[#E5E5E5] bg-white">
+                      <div className="flex items-center justify-between gap-3 mb-2">
+                        <h4 className="font-display text-[20px] text-[#0F1635]">{fix.title}</h4>
+                        <span className="text-[10px] font-extrabold uppercase tracking-[1px] px-2.5 py-1 rounded-full bg-[#D9F0FE] text-[#1899D6]">
+                          {fix.language}
+                        </span>
+                      </div>
+                      <p className="text-[13px] text-[#777] leading-relaxed">{fix.explanation}</p>
+                    </div>
+                    <pre className="bg-[#0F1635] text-[#A8E6FF] p-5 overflow-x-auto text-[12px] leading-relaxed font-mono">
+                      <code>{fix.code}</code>
+                    </pre>
+                  </div>
                 ))}
               </div>
             </>
@@ -447,34 +568,61 @@ function Index() {
         </section>
       )}
 
-      {/* How it works */}
-      <section id="how" className="mx-auto max-w-7xl px-6 py-20">
-        <h2 className="text-3xl font-bold text-center mb-12">How ShieldUX works</h2>
-        <div className="grid md:grid-cols-4 gap-4">
-          {[
-            { step: "01", title: "Upload", desc: "Drop a screenshot or paste a URL." },
-            { step: "02", title: "Agents analyze", desc: "UX, Accessibility, Security agents audit in parallel." },
-            { step: "03", title: "Risk scoring", desc: "Findings are categorized HIGH / MEDIUM / LOW." },
-            { step: "04", title: "Codex fixes", desc: "Get ready-to-paste React + Tailwind code." },
-          ].map((s) => (
-            <Card key={s.step} className="bg-white/5 border-white/10">
-              <CardHeader>
-                <span className="text-cyan-400 font-mono text-sm">{s.step}</span>
-                <CardTitle className="text-white">{s.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-slate-400">{s.desc}</p>
-              </CardContent>
-            </Card>
-          ))}
+      {/* HOW IT WORKS */}
+      <section id="how" className="bg-[#FAFAF7] border-t-2 border-[#E5E5E5]">
+        <div className="mx-auto max-w-[1280px] px-6 py-20">
+          <SectionLabel>How it works</SectionLabel>
+          <h2 className="font-display text-[36px] md:text-[48px] text-[#0F1635] mb-12">
+            Four steps from <span className="text-[#58CC02]">screenshot to ship</span>.
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              { n: "01", title: "Upload", desc: "Drop a screenshot or paste a URL.", color: "#58CC02" },
+              { n: "02", title: "Analyze", desc: "Four agents audit in parallel.", color: "#1CB0F6" },
+              { n: "03", title: "Score", desc: "HIGH / MEDIUM / LOW risk findings.", color: "#FF9600" },
+              { n: "04", title: "Fix", desc: "Paste the Codex patches and ship.", color: "#FFC800" },
+            ].map((s) => (
+              <div key={s.n} className="card-chunky p-6 hover:card-chunky-hover">
+                <div
+                  className="h-12 w-12 rounded-2xl grid place-items-center font-display text-[20px] text-white mb-4 shadow-[0_3px_0_0_rgba(0,0,0,0.15)]"
+                  style={{ background: s.color }}
+                >
+                  {s.n}
+                </div>
+                <h3 className="font-display text-[22px] text-[#0F1635] mb-1">{s.title}</h3>
+                <p className="text-[14px] text-[#777]">{s.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <footer className="border-t border-white/5 mt-12">
-        <div className="mx-auto max-w-7xl px-6 py-8 flex items-center justify-between text-sm text-slate-500">
+      {/* CTA */}
+      <section className="mx-auto max-w-[920px] px-6 py-20 text-center">
+        <div className="card-chunky p-10 sm:p-14 bg-gradient-to-br from-[#EAF8DC] via-white to-[#D9F0FE]">
+          <h2 className="font-display text-[34px] md:text-[48px] text-[#0F1635] leading-[1] mb-4">
+            Ready to earn your <span className="text-[#58CC02]">trust badge?</span>
+          </h2>
+          <p className="text-[16px] text-[#777] max-w-md mx-auto mb-8">
+            Run your first audit free. No signup. Just drop a screenshot.
+          </p>
+          <Btn
+            size="lg"
+            onClick={() => document.getElementById("audit")?.scrollIntoView({ behavior: "smooth" })}
+          >
+            Start auditing <ArrowRight className="h-4 w-4" strokeWidth={3} />
+          </Btn>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t-2 border-[#E5E5E5] bg-white">
+        <div className="mx-auto max-w-[1280px] px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] font-bold uppercase tracking-[0.5px] text-[#AFAFAF]">
           <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-cyan-400" />
-            <span>ShieldUX — AI Product Security & UX Auditor</span>
+            <div className="h-6 w-6 rounded-md bg-[#58CC02] grid place-items-center">
+              <Shield className="h-3.5 w-3.5 text-white" strokeWidth={3} />
+            </div>
+            <span>ShieldUX · AI Product Auditor</span>
           </div>
           <span>Built with Lovable AI</span>
         </div>
