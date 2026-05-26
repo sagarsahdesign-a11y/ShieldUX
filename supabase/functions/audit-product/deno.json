@@ -1,0 +1,2 @@
+[functions.audit-product]
+verify_jwt = false
