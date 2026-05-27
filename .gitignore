@@ -34,3 +34,6 @@ dist-ssr
 # Next.js
 .next/
 
+# Vercel
+.vercel
+
