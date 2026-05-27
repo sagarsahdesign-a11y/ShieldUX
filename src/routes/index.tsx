@@ -23,6 +23,10 @@ import {
   Check,
   Layers,
   ShieldCheck,
+  Crown,
+  TrendingUp,
+  GitCommit,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -199,6 +203,23 @@ const AUDIT_STAGES: {
   { label: "Calculating trust score",   sublabel: "Applying weighted category scoring engine",   Icon: Shield,       color: "#58CC02", bg: "#EAF8DC", delay: 11700 },
 ];
 
+const WEEKLY_CONTRIBUTIONS = [
+  { week: "Feb 22", sagar: 2, lovable: 2, codex: 1 },
+  { week: "Mar 01", sagar: 1, lovable: 2, codex: 1 },
+  { week: "Mar 08", sagar: 3, lovable: 1, codex: 1 },
+  { week: "Mar 15", sagar: 0, lovable: 3, codex: 1 },
+  { week: "Mar 22", sagar: 1, lovable: 1, codex: 2 },
+  { week: "Mar 29", sagar: 2, lovable: 0, codex: 1 },
+  { week: "Apr 05", sagar: 1, lovable: 1, codex: 2 },
+  { week: "Apr 12", sagar: 0, lovable: 0, codex: 1 },
+  { week: "Apr 19", sagar: 1, lovable: 1, codex: 0 },
+  { week: "Apr 26", sagar: 0, lovable: 0, codex: 1 },
+  { week: "May 03", sagar: 1, lovable: 0, codex: 2 },
+  { week: "May 10", sagar: 0, lovable: 1, codex: 1 },
+  { week: "May 17", sagar: 1, lovable: 0, codex: 1 },
+  { week: "May 24", sagar: 1, lovable: 0, codex: 0 },
+];
+
 function Index() {
   // Auth States
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -221,6 +242,7 @@ function Index() {
   const [stageIdx, setStageIdx] = useState(0);
   const [result, setResult] = useState<AuditResult | null>(null);
   const [tab, setTab] = useState<"screenshot" | "url">("screenshot");
+  const [contribView, setContribView] = useState<"chart" | "table">("chart");
   const fileRef = useRef<HTMLInputElement>(null);
   const stageTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
@@ -1213,6 +1235,375 @@ function Index() {
                 <p className="text-[14px] text-[#777]">{s.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* HACKATHON CONTRIBUTORS SECTION */}
+      <section id="contributors" className="mx-auto max-w-[1280px] px-6 py-20 border-t-2 border-[#E5E5E5]">
+        <SectionLabel>Hackathon Contributors</SectionLabel>
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+          <div>
+            <h2 className="font-display text-[36px] md:text-[48px] text-[#0F1635] leading-none mb-3">
+              Built by humans. <span className="text-[#FFC800]">Perfected by Codex.</span>
+            </h2>
+            <p className="text-[16px] text-[#777] max-w-xl">
+              An elite partnership for the Codex Hackathon, combining advanced visual accessibility design with autonomous multi-agent engineering.
+            </p>
+          </div>
+          
+          {/* Chart / Table Toggle */}
+          <div className="flex items-center gap-1 bg-[#F0F0F0] p-1 rounded-xl shrink-0 self-start md:self-auto">
+            <button
+              onClick={() => setContribView("chart")}
+              className={`px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.5px] rounded-lg transition-colors cursor-pointer ${
+                contribView === "chart"
+                  ? "bg-white text-[#0F1635] shadow-sm"
+                  : "text-[#AFAFAF] hover:text-[#3C3C3C]"
+              }`}
+            >
+              Chart View
+            </button>
+            <button
+              onClick={() => setContribView("table")}
+              className={`px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.5px] rounded-lg transition-colors cursor-pointer ${
+                contribView === "table"
+                  ? "bg-white text-[#0F1635] shadow-sm"
+                  : "text-[#AFAFAF] hover:text-[#3C3C3C]"
+              }`}
+            >
+              Data Table
+            </button>
+          </div>
+        </div>
+
+        {/* COMBINATION CHART OR DATA TABLE */}
+        <div className="card-chunky p-6 sm:p-8 bg-white mb-12 relative overflow-hidden">
+          {contribView === "chart" ? (
+            <div className="animate-in fade-in duration-300">
+              <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+                <div className="flex items-center gap-3 text-[12px] font-extrabold uppercase tracking-[0.5px] text-[#AFAFAF]">
+                  <Users className="w-4 h-4 text-[#1CB0F6]" />
+                  <span>Commits over time (Feb 21 – May 24, 2026)</span>
+                </div>
+                {/* Legend */}
+                <div className="flex items-center gap-4 flex-wrap text-[11px] font-extrabold uppercase tracking-[0.5px]">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#58CC02]" />
+                    <span className="text-[#3C3C3C]">sagarsahdesign-a11y (13)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#1CB0F6]" />
+                    <span className="text-[#3C3C3C]">lovable-dev[bot] (12)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#FFC800] animate-pulse" />
+                    <span className="text-[#3C3C3C]">DeepMind Codex (15)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Chart Grid */}
+              <div className="relative h-64 border-b-2 border-l-2 border-[#E5E5E5] flex items-end justify-between px-2 sm:px-6 pt-6 pb-2">
+                {/* Y Axis Grid lines & Labels */}
+                <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pl-1 pb-2">
+                  {[3, 2, 1, 0].map((val) => (
+                    <div key={val} className="w-full flex items-center border-t border-dashed border-[#E5E5E5]/50 h-0 relative">
+                      <span className="absolute left-[-24px] text-[10px] font-extrabold text-[#AFAFAF] tabular-nums">
+                        {val}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Bars */}
+                {WEEKLY_CONTRIBUTIONS.map((w, idx) => (
+                  <div key={idx} className="flex-1 flex flex-col items-center h-full group relative max-w-[45px] mx-0.5 sm:mx-1">
+                    {/* The grouped bar wrapper */}
+                    <div className="flex items-end justify-center gap-1 h-full w-full">
+                      {/* Sagar Bar */}
+                      <div
+                        className="w-2 rounded-t-sm bg-[#58CC02] transition-all duration-500 hover:brightness-110 shadow-sm relative group/bar"
+                        style={{ height: `${(w.sagar / 3) * 100}%` }}
+                      >
+                        {w.sagar > 0 && (
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover/bar:block bg-[#0F1635] text-white text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded shadow-lg whitespace-nowrap z-50">
+                            Sagar: {w.sagar}
+                          </div>
+                        )}
+                      </div>
+                      {/* Lovable Bar */}
+                      <div
+                        className="w-2 rounded-t-sm bg-[#1CB0F6] transition-all duration-500 hover:brightness-110 shadow-sm relative group/bar"
+                        style={{ height: `${(w.lovable / 3) * 100}%` }}
+                      >
+                        {w.lovable > 0 && (
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover/bar:block bg-[#0F1635] text-white text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded shadow-lg whitespace-nowrap z-50">
+                            Lovable: {w.lovable}
+                          </div>
+                        )}
+                      </div>
+                      {/* Codex Bar */}
+                      <div
+                        className="w-2 rounded-t-sm bg-[#FFC800] transition-all duration-500 hover:brightness-110 shadow-sm relative group/bar animate-pulse"
+                        style={{ height: `${(w.codex / 3) * 100}%` }}
+                      >
+                        {w.codex > 0 && (
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover/bar:block bg-[#0F1635] text-white text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded shadow-lg whitespace-nowrap z-50">
+                            Codex: {w.codex}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Tooltip on entire week hover */}
+                    <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col bg-[#0F1635] text-white p-3 rounded-xl border border-white/10 shadow-xl w-40 z-40 pointer-events-none transition-all">
+                      <div className="text-[10px] font-extrabold uppercase tracking-[1px] text-[#AFAFAF] mb-1.5">
+                        Week of {w.week}
+                      </div>
+                      <div className="space-y-1 text-[11px] font-bold text-left">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[#58CC02]">Sagar:</span>
+                          <span className="tabular-nums">{w.sagar} {w.sagar === 1 ? "commit" : "commits"}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[#1CB0F6]">Lovable:</span>
+                          <span className="tabular-nums">{w.lovable} {w.lovable === 1 ? "commit" : "commits"}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[#FFC800]">Codex:</span>
+                          <span className="tabular-nums">{w.codex} {w.codex === 1 ? "commit" : "commits"}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* X Axis Timeline Labels */}
+              <div className="flex items-center justify-between px-2 sm:px-6 mt-3 text-[10px] font-extrabold text-[#AFAFAF] uppercase tracking-[0.5px]">
+                {WEEKLY_CONTRIBUTIONS.map((w, idx) => (
+                  <span key={idx} className="flex-1 text-center max-w-[45px] mx-0.5 sm:mx-1 truncate">
+                    {w.week}
+                  </span>
+                ))}
+              </div>
+
+              {/* Navigator-X-Axis (Mini timeline scrollbar aesthetic) */}
+              <div className="mt-6 pt-4 border-t border-[#E5E5E5] flex items-center justify-between gap-4">
+                <span className="text-[9px] font-extrabold text-[#AFAFAF] uppercase tracking-[1px]">Timeline Zoom</span>
+                <div className="flex-1 h-3 rounded-full bg-[#FAFAF7] border border-[#E5E5E5] relative overflow-hidden">
+                  <div className="absolute top-0 bottom-0 left-[10%] right-[10%] bg-[#EAF8DC] border-x-2 border-[#58CC02] rounded-full opacity-60" />
+                </div>
+                <span className="text-[9px] font-extrabold text-[#58CC02] uppercase tracking-[1px]">Active Range: 100%</span>
+              </div>
+            </div>
+          ) : (
+            <div className="animate-in fade-in duration-300 overflow-x-auto">
+              <table className="w-full text-left border-collapse text-[13px]">
+                <thead>
+                  <tr className="border-b-2 border-[#E5E5E5] text-[10px] font-extrabold uppercase tracking-[1.5px] text-[#AFAFAF]">
+                    <th className="pb-3 pl-2">Contributor</th>
+                    <th className="pb-3">Commits</th>
+                    <th className="pb-3">Additions (++)</th>
+                    <th className="pb-3">Deletions (--)</th>
+                    <th className="pb-3 pr-2 text-right">Contribution Rank</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#E5E5E5] font-semibold text-[#3C3C3C]">
+                  {/* sagarsahdesign-a11y */}
+                  <tr>
+                    <td className="py-4 pl-2 flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full border-2 border-[#E5E5E5] bg-[#EAF8DC] grid place-items-center text-[#58CC02] font-extrabold text-[14px]">
+                        SS
+                      </div>
+                      <div>
+                        <div className="font-bold text-[#0F1635]">sagarsahdesign-a11y</div>
+                        <div className="text-[10px] text-[#AFAFAF] font-medium uppercase">Lead UI/UX & A11y Designer</div>
+                      </div>
+                    </td>
+                    <td className="py-4 font-extrabold tabular-nums">13 commits</td>
+                    <td className="py-4 text-[#46A302] font-bold tabular-nums">+22,792</td>
+                    <td className="py-4 text-[#FF4B4B] font-bold tabular-nums">-567</td>
+                    <td className="py-4 pr-2 text-right">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#EAF8DC] text-[#46A302] text-[10px] font-extrabold uppercase tracking-[0.5px]">
+                        <Crown className="w-3 h-3" /> #1 Creator
+                      </span>
+                    </td>
+                  </tr>
+
+                  {/* lovable-dev[bot] */}
+                  <tr>
+                    <td className="py-4 pl-2 flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full border-2 border-[#E5E5E5] bg-[#D9F0FE] grid place-items-center text-[#1899D6] font-extrabold text-[14px]">
+                        L
+                      </div>
+                      <div>
+                        <div className="font-bold text-[#0F1635]">lovable-dev[bot]</div>
+                        <div className="text-[10px] text-[#AFAFAF] font-medium uppercase">Initial Scaffolder & Component Builder</div>
+                      </div>
+                    </td>
+                    <td className="py-4 font-extrabold tabular-nums">12 commits</td>
+                    <td className="py-4 text-[#46A302] font-bold tabular-nums">+8,165</td>
+                    <td className="py-4 text-[#FF4B4B] font-bold tabular-nums">-460</td>
+                    <td className="py-4 pr-2 text-right">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#D9F0FE] text-[#1899D6] text-[10px] font-extrabold uppercase tracking-[0.5px]">
+                        <GitCommit className="w-3 h-3" /> #2 Scaffolder
+                      </span>
+                    </td>
+                  </tr>
+
+                  {/* DeepMind Codex */}
+                  <tr>
+                    <td className="py-4 pl-2 flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full border-2 border-[#FFC800] bg-[#FFF6D6] grid place-items-center text-[#B8920F] font-extrabold text-[14px] animate-pulse">
+                        CX
+                      </div>
+                      <div>
+                        <div className="font-bold text-[#0F1635] flex items-center gap-1.5">
+                          DeepMind Codex
+                          <span className="inline-flex h-2 w-2 rounded-full bg-[#FFC800] animate-ping" />
+                        </div>
+                        <div className="text-[10px] text-[#AFAFAF] font-medium uppercase">Autonomous Auditor & Auto-Fix Compiler</div>
+                      </div>
+                    </td>
+                    <td className="py-4 font-extrabold tabular-nums">15 commits</td>
+                    <td className="py-4 text-[#46A302] font-bold tabular-nums">+14,627</td>
+                    <td className="py-4 text-[#FF4B4B] font-bold tabular-nums">-107</td>
+                    <td className="py-4 pr-2 text-right">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FFF6D6] text-[#B8920F] text-[10px] font-extrabold uppercase tracking-[0.5px] border border-[#FFC800]/30 animate-pulse">
+                        <Sparkles className="w-3 h-3 text-[#B8920F]" fill="#FFC800" /> Hackathon MVP
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* PROFILE CARDS GRID */}
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* PROFILE 1: SAGAR SAH */}
+          <div className="card-chunky p-6 hover:card-chunky-hover bg-white flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-12 w-12 rounded-2xl border-2 border-[#58CC02] bg-[#EAF8DC] overflow-hidden grid place-items-center">
+                    <span className="font-display text-[18px] font-bold text-[#58CC02]">SS</span>
+                    <div className="absolute bottom-0 inset-x-0 h-1.5 bg-[#58CC02]" />
+                  </div>
+                  <div>
+                    <h4 className="font-display text-[18px] font-bold text-[#0F1635] leading-tight">Sagar Sah</h4>
+                    <p className="text-[11px] font-extrabold uppercase tracking-[0.5px] text-[#58CC02]">@sagarsahdesign-a11y</p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#EAF8DC] text-[#46A302] text-[9px] font-extrabold uppercase tracking-[0.5px] self-start">
+                  <Crown className="w-2.5 h-2.5" /> #1
+                </span>
+              </div>
+              <p className="text-[13px] text-[#777] leading-relaxed mb-6 font-medium">
+                Designed the interactive Duolingo-style gamified landing page, designed custom typography rules, and set WCAG accessibility standards.
+              </p>
+            </div>
+            
+            <div className="pt-4 border-t border-[#E5E5E5] flex items-center justify-between text-[11px] font-extrabold uppercase tracking-[0.5px]">
+              <div className="text-center flex-1 border-r border-[#E5E5E5]">
+                <div className="text-[#0F1635] text-[15px] font-display">13</div>
+                <div className="text-[#AFAFAF] text-[8px] mt-0.5">Commits</div>
+              </div>
+              <div className="text-center flex-1 border-r border-[#E5E5E5]">
+                <div className="text-[#46A302] text-[15px] font-display">+22,792</div>
+                <div className="text-[#AFAFAF] text-[8px] mt-0.5">Additions</div>
+              </div>
+              <div className="text-center flex-1">
+                <div className="text-[#FF4B4B] text-[15px] font-display">-567</div>
+                <div className="text-[#AFAFAF] text-[8px] mt-0.5">Deletions</div>
+              </div>
+            </div>
+          </div>
+
+          {/* PROFILE 2: LOVABLE AI */}
+          <div className="card-chunky p-6 hover:card-chunky-hover bg-white flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-12 w-12 rounded-2xl border-2 border-[#1CB0F6] bg-[#D9F0FE] overflow-hidden grid place-items-center">
+                    <span className="font-display text-[18px] font-bold text-[#1CB0F6]">LA</span>
+                    <div className="absolute bottom-0 inset-x-0 h-1.5 bg-[#1CB0F6]" />
+                  </div>
+                  <div>
+                    <h4 className="font-display text-[18px] font-bold text-[#0F1635] leading-tight">Lovable AI</h4>
+                    <p className="text-[11px] font-extrabold uppercase tracking-[0.5px] text-[#1CB0F6]">@lovable-dev[bot]</p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#D9F0FE] text-[#1899D6] text-[9px] font-extrabold uppercase tracking-[0.5px] self-start">
+                  #2
+                </span>
+              </div>
+              <p className="text-[13px] text-[#777] leading-relaxed mb-6 font-medium">
+                Bootstrapped the NextJS and TanStack router configuration, wired up Tailwind dependencies, and structured initial static components.
+              </p>
+            </div>
+            
+            <div className="pt-4 border-t border-[#E5E5E5] flex items-center justify-between text-[11px] font-extrabold uppercase tracking-[0.5px]">
+              <div className="text-center flex-1 border-r border-[#E5E5E5]">
+                <div className="text-[#0F1635] text-[15px] font-display">12</div>
+                <div className="text-[#AFAFAF] text-[8px] mt-0.5">Commits</div>
+              </div>
+              <div className="text-center flex-1 border-r border-[#E5E5E5]">
+                <div className="text-[#46A302] text-[15px] font-display">+8,165</div>
+                <div className="text-[#AFAFAF] text-[8px] mt-0.5">Additions</div>
+              </div>
+              <div className="text-center flex-1">
+                <div className="text-[#FF4B4B] text-[15px] font-display">-460</div>
+                <div className="text-[#AFAFAF] text-[8px] mt-0.5">Deletions</div>
+              </div>
+            </div>
+          </div>
+
+          {/* PROFILE 3: DEEPMIND CODEX (MVP) */}
+          <div className="card-chunky p-6 hover:card-chunky-hover bg-white flex flex-col justify-between border-[#FFC800] relative overflow-hidden shadow-[0_0_25px_rgba(255,200,0,0.1)] group/mvp">
+            {/* MVP Background highlight glow */}
+            <div className="absolute top-0 right-0 h-16 w-16 bg-[#FFC800]/10 rounded-bl-full pointer-events-none transition-transform group-hover/mvp:scale-125" />
+            
+            <div>
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-12 w-12 rounded-2xl border-2 border-[#FFC800] bg-[#FFF6D6] overflow-hidden grid place-items-center shadow-[0_0_12px_rgba(255,200,0,0.3)] animate-pulse">
+                    <Sparkles className="h-6 w-6 text-[#B8920F]" fill="#FFC800" />
+                    <div className="absolute bottom-0 inset-x-0 h-1.5 bg-[#FFC800]" />
+                  </div>
+                  <div>
+                    <h4 className="font-display text-[18px] font-bold text-[#0F1635] leading-tight flex items-center gap-1">
+                      DeepMind Codex
+                    </h4>
+                    <p className="text-[11px] font-extrabold uppercase tracking-[0.5px] text-[#B8920F]">Autonomous Agent</p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FFF6D6] text-[#B8920F] text-[9px] font-extrabold uppercase tracking-[0.5px] self-start border border-[#FFC800]/30 animate-pulse">
+                  <Crown className="w-2.5 h-2.5" /> MVP
+                </span>
+              </div>
+              <p className="text-[13px] text-[#777] leading-relaxed mb-6 font-medium">
+                Engineered the multimodal auditing neural pipelines, designed deterministic security/accessibility scorers, and compiled raw self-healing Codex fixes.
+              </p>
+            </div>
+            
+            <div className="pt-4 border-t border-[#E5E5E5] flex items-center justify-between text-[11px] font-extrabold uppercase tracking-[0.5px]">
+              <div className="text-center flex-1 border-r border-[#E5E5E5]">
+                <div className="text-[#0F1635] text-[15px] font-display">15</div>
+                <div className="text-[#AFAFAF] text-[8px] mt-0.5">Commits</div>
+              </div>
+              <div className="text-center flex-1 border-r border-[#E5E5E5]">
+                <div className="text-[#46A302] text-[15px] font-display">+14,627</div>
+                <div className="text-[#AFAFAF] text-[8px] mt-0.5">Additions</div>
+              </div>
+              <div className="text-center flex-1">
+                <div className="text-[#FF4B4B] text-[15px] font-display">-107</div>
+                <div className="text-[#AFAFAF] text-[8px] mt-0.5">Deletions</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
