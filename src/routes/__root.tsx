@@ -73,15 +73,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "ShieldUX — AI Product Security & UX Auditor" },
-      { name: "description", content: "Audit your product for UX, accessibility, privacy, and security issues with AI agents. Get actionable fixes and code snippets." },
+      {
+        name: "description",
+        content:
+          "Audit your product for UX, accessibility, privacy, and security issues with AI analysis. Get actionable fixes and code snippets.",
+      },
       { property: "og:title", content: "ShieldUX — AI Product Security & UX Auditor" },
-      { property: "og:description", content: "Audit your product for UX, accessibility, privacy, and security issues with AI agents. Get actionable fixes and code snippets." },
+      {
+        property: "og:description",
+        content:
+          "Audit your product for UX, accessibility, privacy, and security issues with AI analysis. Get actionable fixes and code snippets.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "ShieldUX — AI Product Security & UX Auditor" },
-      { name: "twitter:description", content: "Audit your product for UX, accessibility, privacy, and security issues with AI agents. Get actionable fixes and code snippets." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/2220651a-afc5-4a28-a273-753452018cc1" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/2220651a-afc5-4a28-a273-753452018cc1" },
+      {
+        name: "twitter:description",
+        content:
+          "Audit your product for UX, accessibility, privacy, and security issues with AI analysis. Get actionable fixes and code snippets.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/2220651a-afc5-4a28-a273-753452018cc1",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/2220651a-afc5-4a28-a273-753452018cc1",
+      },
     ],
     links: [
       {

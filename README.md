@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ShieldUX
 
-## Getting Started
+AI-powered Product Security, Accessibility, UX & Privacy Auditor.
 
-First, run the development server:
+ShieldUX analyzes screenshots and URL inputs to detect usability issues, accessibility problems, security risks, and product trust gaps - then generates actionable fixes and code recommendations. Repository and design-surface auditing are part of the broader product direction, while the current MVP focuses on screenshot and URL review.
+
+## Core Features
+
+- Screenshot / URL auditing
+- UX analysis
+- Accessibility analysis
+- Security review
+- Privacy & trust checks
+- AI-generated findings
+- Codex-powered fix recommendations
+- Dynamic trust scoring
+
+## Problem
+
+Teams ship interfaces with hidden UX, accessibility, and security issues that are hard to catch manually.
+
+## Solution
+
+ShieldUX uses multimodal AI analysis to audit digital products and generate structured findings plus implementation-ready fixes.
+
+## Tech Stack
+
+- TanStack Start / TanStack Router
+- Vite
+- TypeScript
+- React
+- Tailwind CSS
+- Supabase authentication
+- RapidAPI GPT-4o integration for AI analysis
+- AI-assisted development workflows
+
+## How It Works
+
+1. Upload a screenshot or enter a URL.
+2. AI analyzes the product surface across UX, accessibility, security, privacy, and frontend quality.
+3. ShieldUX returns structured findings by category and severity.
+4. The server computes category scores and a weighted trust score.
+5. The app returns actionable fixes and code recommendations.
+
+## Development Notes
+
+Built using human-led product design, AI-assisted engineering workflows, and Codex-supported development tooling.
+
+The current MVP includes a TanStack Start landing page, guest and Supabase-backed auth entry points, screenshot / URL audit inputs, a server route at `/api/analyze`, deterministic trust scoring, fallback demo results when the AI provider is not configured, and Codex-style fix cards.
+
+## Run Locally
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open the local URL printed by Vite. In this project, Vite may use `http://localhost:8080` by default; if that port is unavailable, run a specific port:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run dev -- --host 0.0.0.0 --port 5173
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Build for production:
 
-## Learn More
+```bash
+npm run build
+```
 
-To learn more about Next.js, take a look at the following resources:
+Preview the production build:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run preview
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Run linting:
 
-## Deploy on Vercel
+```bash
+npm run lint
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Environment Variables
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Create a local `.env.local` file for development. Do not commit real secrets.
+
+Required for Supabase client/auth:
+
+```bash
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_URL=
+SUPABASE_PUBLISHABLE_KEY=
+```
+
+Required for live AI analysis:
+
+```bash
+RAPIDAPI_KEY=
+RAPIDAPI_HOST=gpt-4o.p.rapidapi.com
+```
+
+Optional for trusted server-only Supabase admin usage:
+
+```bash
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+If `RAPIDAPI_KEY` is missing or configured as a placeholder, ShieldUX serves a computed demo report so the MVP remains demoable without exposing provider credentials.
+
+## Production Safety
+
+- Keep service-role and provider keys server-side only.
+- Use Vite-prefixed Supabase variables only for publishable client configuration.
+- Never expose RapidAPI or service-role secrets in browser code.
+- Validate production environment variables before deployment.
