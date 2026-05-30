@@ -728,22 +728,12 @@ function Index() {
 
       {/* HERO SECTION */}
       <section className="relative overflow-hidden border-b border-neutral-200/60 bg-[#f0f0ee] py-16 sm:py-24">
-        {/* Fullscreen autoplaying, looping background video scoped to the hero section */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none z-0"
-        >
-          <source
-            src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4"
-            type="video/mp4"
-          />
-        </video>
-
-        {/* Elegant glassmorphic contrast overlay to guarantee high-accessibility text contrast */}
-        <div className="absolute inset-0 bg-[#f0f0ee]/80 backdrop-blur-[1px] z-10 pointer-events-none" />
+        {/* Warm premium background gradients + technical grid */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(132,204,22,0.06),transparent_45%)] pointer-events-none" />
+        <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-lime-300/5 blur-[120px] pointer-events-none" />
+        
+        {/* Subtle clean tech grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.01)_1px,transparent_1px)] bg-[size:36px_36px] [mask-image:radial-gradient(ellipse_at_center,white,transparent_75%)] pointer-events-none" />
 
         <div className="relative z-20 mx-auto max-w-[1240px] px-6 flex flex-col lg:flex-row items-center justify-between gap-16">
           
@@ -847,11 +837,18 @@ function Index() {
                 {/* High-fidelity glowing spotlight behind the hand */}
                 <div className="absolute w-[180px] h-[180px] rounded-full bg-[radial-gradient(circle,_rgba(163,230,53,0.18)_0%,_transparent_70%)] blur-2xl" />
                 
-                <img
-                  src="/robot-hand.png"
-                  alt="AI Product Intelligence Engine"
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
                   className="w-[62%] max-w-[240px] h-auto object-contain mix-blend-multiply opacity-95 drop-shadow-[0_10px_30px_rgba(0,0,0,0.06)] filter contrast-[1.02] saturate-[0.98] transition-all duration-500 hover:scale-105"
-                />
+                >
+                  <source
+                    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4"
+                    type="video/mp4"
+                  />
+                </video>
               </div>
 
               {/* Scanning HUD indicators overlay */}
