@@ -1,16 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:ital,wght@0,300..800;1,300..800&display=swap');
 @import "tailwindcss" source(none);
 @import "tw-animate-css";
 @source "../src";
 
-
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: "Nunito", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: "Fredoka", "Nunito", sans-serif;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-display: "Plus Jakarta Sans", sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -56,37 +54,37 @@
 }
 
 :root {
-  --radius: 0.875rem;
+  --radius: 0.75rem;
 
-  /* ShieldUX palette (Duo-inspired but custom) */
-  --shield-green: #58CC02;
-  --shield-green-hover: #4BB200;
-  --shield-green-shadow: #46A302;
-  --shield-blue: #1CB0F6;
-  --shield-blue-shadow: #1899D6;
-  --shield-dark: #0F1635;
-  --shield-red: #FF4B4B;
-  --shield-orange: #FF9600;
-  --shield-golden: #FFC800;
-  --shield-text: #3C3C3C;
-  --shield-light: #777777;
-  --shield-nav: #AFAFAF;
-  --shield-border: #E5E5E5;
+  /* ShieldUX Premium Cyber Palette */
+  --shield-green: #10B981;
+  --shield-green-hover: #059669;
+  --shield-green-shadow: rgba(16, 185, 129, 0.15);
+  --shield-blue: #0EA5E9;
+  --shield-blue-shadow: rgba(14, 165, 233, 0.15);
+  --shield-dark: #070913;
+  --shield-red: #EF4444;
+  --shield-orange: #F59E0B;
+  --shield-golden: #EAB308;
+  --shield-text: #F8FAFC;
+  --shield-light: #94A3B8;
+  --shield-nav: #64748B;
+  --shield-border: #1E293B;
 
-  --background: #FFFFFF;
+  --background: #070913;
   --foreground: var(--shield-text);
-  --card: #FFFFFF;
+  --card: #0F172A;
   --card-foreground: var(--shield-text);
-  --popover: #FFFFFF;
+  --popover: #0F172A;
   --popover-foreground: var(--shield-text);
   --primary: var(--shield-green);
   --primary-foreground: #FFFFFF;
-  --secondary: #F7F7F7;
+  --secondary: #1E293B;
   --secondary-foreground: var(--shield-text);
-  --muted: #F7F7F7;
+  --muted: #0F172A;
   --muted-foreground: var(--shield-light);
-  --accent: #EAF8DC;
-  --accent-foreground: var(--shield-green-shadow);
+  --accent: rgba(16, 185, 129, 0.1);
+  --accent-foreground: var(--shield-green);
   --destructive: var(--shield-red);
   --destructive-foreground: #FFFFFF;
   --border: var(--shield-border);
@@ -97,9 +95,9 @@
 .dark {
   --background: var(--shield-dark);
   --foreground: #FFFFFF;
-  --card: #1A2150;
+  --card: #0F172A;
   --card-foreground: #FFFFFF;
-  --border: rgba(255,255,255,0.1);
+  --border: var(--shield-border);
 }
 
 @layer base {
@@ -110,73 +108,89 @@
     -moz-osx-font-smoothing: grayscale;
     background-color: var(--color-background);
     color: var(--color-foreground);
+    scroll-behavior: smooth;
   }
 }
 
 @utility font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
-/* Chunky 3D button system */
+/* Premium Cybersecurity Action Button System */
 @utility btn-3d {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-weight: 800;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-radius: 14px;
-  padding: 0 1.5rem;
-  height: 48px;
-  font-size: 15px;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, background-color 0.15s ease;
+  letter-spacing: 0.8px;
+  border-radius: 8px;
+  padding: 0 1.25rem;
+  height: 44px;
+  font-size: 13px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
   cursor: pointer;
+  border: 1px solid transparent;
 }
 @utility btn-primary {
   background-color: var(--shield-green);
-  color: white;
-  box-shadow: 0 4px 0 0 var(--shield-green-shadow);
-  border: 2px solid var(--shield-green);
+  color: #070913;
+  border-color: var(--shield-green);
 }
 @utility btn-primary-hover {
   background-color: var(--shield-green-hover);
+  border-color: var(--shield-green-hover);
+  box-shadow: 0 0 20px var(--shield-green-shadow);
 }
 @utility btn-secondary {
-  background-color: white;
-  color: var(--shield-blue);
-  border: 2px solid var(--shield-border);
-  box-shadow: 0 4px 0 0 var(--shield-border);
+  background-color: transparent;
+  color: #F8FAFC;
+  border-color: var(--shield-border);
+}
+@utility btn-secondary-hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: #475569;
 }
 @utility btn-blue {
   background-color: var(--shield-blue);
   color: white;
-  border: 2px solid var(--shield-blue);
-  box-shadow: 0 4px 0 0 var(--shield-blue-shadow);
+  border-color: var(--shield-blue);
+}
+@utility btn-blue-hover {
+  background-color: #0284C7;
+  border-color: #0284C7;
+  box-shadow: 0 0 20px var(--shield-blue-shadow);
 }
 @utility btn-danger {
   background-color: var(--shield-red);
   color: white;
-  border: 2px solid var(--shield-red);
-  box-shadow: 0 4px 0 0 #CC3C3C;
+  border-color: var(--shield-red);
+}
+@utility btn-danger-hover {
+  background-color: #DC2626;
+  border-color: #DC2626;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
 }
 @utility btn-press {
   &:active:not(:disabled) {
-    transform: translateY(4px);
-    box-shadow: 0 0 0 0 transparent !important;
+    transform: scale(0.97);
   }
 }
 
-/* Card with subtle bottom shadow */
+/* Premium Cybersecurity Slate Cards */
 @utility card-chunky {
-  background: white;
-  border: 2px solid var(--shield-border);
-  border-radius: 18px;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--shield-border);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 @utility card-chunky-hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+  border-color: #334155;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  background: rgba(15, 23, 42, 0.85);
 }
+
