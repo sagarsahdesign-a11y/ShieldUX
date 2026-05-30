@@ -485,7 +485,7 @@ function Index() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#f0f0ee] antialiased selection:bg-lime-200 selection:text-neutral-900 font-sans text-neutral-800">
+    <div className="relative min-h-screen overflow-hidden flex flex-col bg-[#f0f0ee] antialiased selection:bg-lime-200 selection:text-neutral-900 font-sans text-neutral-800">
       <Toaster />
 
       {/* Warm off-white gradients and grid overlay */}
@@ -750,7 +750,7 @@ function Index() {
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative overflow-hidden border-b border-neutral-200/60 bg-[#f0f0ee] py-16 sm:py-24">
+      <section className="relative border-b border-neutral-200/60 bg-[#f0f0ee] py-16 sm:pt-24 sm:pb-12">
         {/* Warm premium background gradients + technical grid */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(132,204,22,0.06),transparent_45%)] pointer-events-none" />
         <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-lime-300/5 blur-[120px] pointer-events-none" />
@@ -798,7 +798,7 @@ function Index() {
             </div>
 
             {/* Mini Stats strip */}
-            <div className="grid grid-cols-3 gap-3.5 max-w-lg">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-3.5 max-w-lg">
               {[
                 { icon: Layers, value: "5 Domains", label: "Audit Domains", color: "#10B981" },
                 { icon: ShieldCheck, value: "100%", label: "Actionable Fixes", color: "#F59E0B" },
@@ -822,7 +822,7 @@ function Index() {
           </div>
 
           {/* Right Column - floating layered hero composition */}
-          <div className="flex-1 relative w-full max-w-lg lg:max-w-xl min-h-[500px] sm:min-h-[560px] flex items-center justify-center select-none">
+          <div className="flex-1 relative w-full max-w-lg lg:max-w-xl min-h-[340px] sm:min-h-[480px] flex items-center justify-center select-none scale-95 sm:scale-100 origin-center mt-8 sm:mt-0">
             {/* Open-space intelligence field behind the hand */}
             <div className="absolute inset-[-8%] rounded-full bg-[radial-gradient(circle_at_center,_rgba(190,242,100,0.22)_0%,_rgba(236,252,203,0.12)_28%,_rgba(255,255,255,0)_66%)] blur-2xl pointer-events-none" />
             <div className="absolute inset-[8%] rounded-full border border-lime-300/20 bg-white/10 backdrop-blur-[2px] [mask-image:radial-gradient(circle_at_center,white,transparent_72%)] pointer-events-none" />
@@ -862,7 +862,7 @@ function Index() {
                 maskImage:
                   "radial-gradient(ellipse 54% 66% at 58% 57%, black 34%, rgba(0,0,0,0.78) 48%, transparent 74%)",
               }}
-              className="absolute inset-0 z-10 flex items-center justify-center overflow-hidden pointer-events-none mix-blend-multiply"
+              className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none mix-blend-multiply"
             >
               <video
                 autoPlay
@@ -972,7 +972,7 @@ function Index() {
             </div>
 
             {/* Floating Card 3 — Codex Fix Card */}
-            <div className="absolute top-[23%] right-0 w-[178px] sm:top-[3%] sm:w-[215px] rounded-xl border border-neutral-800 bg-neutral-950 p-3.5 sm:p-4 shadow-[0_18px_48px_rgba(0,0,0,0.16)] hover:-translate-y-0.5 transition-all duration-300 text-left font-mono z-30">
+            <div className="absolute top-[23%] right-0 w-[178px] sm:top-[3%] sm:w-[215px] rounded-xl border border-neutral-800 bg-neutral-950 p-3.5 sm:p-4 shadow-[0_18px_48px_rgba(0,0,0,0.16)] hover:-translate-y-0.5 transition-all duration-300 text-left font-mono z-30 hidden sm:block">
               <div className="flex items-center justify-between border-b border-neutral-850 pb-2 mb-2.5">
                 <div className="flex items-center gap-1.5">
                   <Code2 className="w-3.5 h-3.5 text-neutral-400" />
@@ -1630,13 +1630,13 @@ function Index() {
       </section>
 
       {/* FOOTER */}
-      <footer className="border-t border-neutral-200/80 bg-[#f0f0ee] py-8">
+      <footer className="mt-auto border-t border-neutral-200/80 bg-[#f0f0ee] py-8">
         <div className="mx-auto max-w-[1240px] px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] font-bold uppercase tracking-[0.5px] text-neutral-450">
           <div className="flex items-center gap-2">
             <div className="h-6 w-6 rounded-md bg-[#10B981] grid place-items-center">
               <Shield className="h-3.5 w-3.5 text-neutral-950" strokeWidth={3} />
             </div>
-            <span>ShieldUX · AI Product Auditor</span>
+            <span>ShieldUX · AI Product Auditor · made by sagar</span>
           </div>
         </div>
       </footer>

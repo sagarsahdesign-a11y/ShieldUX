@@ -18,18 +18,16 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#f4f4f0] antialiased selection:bg-lime-200 selection:text-neutral-900 font-sans">
-      
       {/* Soft premium background gradients + technical grid */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(132,204,22,0.12),transparent_45%)] pointer-events-none" />
       <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-lime-300/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[20%] w-[60%] h-[60%] rounded-full bg-lime-400/5 blur-[150px] pointer-events-none" />
-      
+
       {/* Elegant minimalist grid pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.012)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.012)_1px,transparent_1px)] bg-[size:36px_36px] [mask-image:radial-gradient(ellipse_at_center,white,transparent_75%)] pointer-events-none" />
 
       {/* Foreground container */}
       <div className="relative z-10 flex flex-col min-h-screen">
-        
         {/* Navbar (Centered Premium Floating Pill Style) */}
         <header className="w-full flex items-center justify-center pt-6 px-5 gap-3">
           {/* Left Logo Pill */}
@@ -50,7 +48,9 @@ export default function App() {
                     href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
                     onClick={() => setActiveNav(item)}
                     className={`text-[13px] font-semibold tracking-tight transition-colors duration-200 cursor-pointer ${
-                      isActive ? "text-neutral-950 font-bold" : "text-neutral-500 hover:text-neutral-900"
+                      isActive
+                        ? "text-neutral-950 font-bold"
+                        : "text-neutral-500 hover:text-neutral-900"
                     }`}
                   >
                     {item}
@@ -70,7 +70,6 @@ export default function App() {
         {/* Hero Content Section */}
         <main className="flex-1 flex items-center justify-center px-6 sm:px-12 lg:px-20 xl:px-24 py-16 lg:py-0">
           <div className="max-w-7xl w-full flex flex-col lg:flex-row items-center justify-between gap-16 lg:gap-8">
-            
             {/* Left Content Column */}
             <div className="flex-1 max-w-2xl text-left">
               {/* Premium Badge */}
@@ -91,15 +90,18 @@ export default function App() {
               {/* Subtext */}
               <p className="text-[15px] sm:text-[16.5px] leading-relaxed text-neutral-600 max-w-xl mb-8">
                 Upload a screenshot, URL, GitHub repo, or Figma file. ShieldUX analyzes UX,
-                accessibility, security, and trust issues — then returns findings, trust scoring, and
-                actionable fixes.
+                accessibility, security, and trust issues — then returns findings, trust scoring,
+                and actionable fixes.
               </p>
 
               {/* CTA Row */}
               <div className="flex flex-wrap gap-3.5 mb-12">
                 <button className="inline-flex items-center gap-2 rounded-full bg-lime-400 text-neutral-950 px-6 py-3.5 text-[13.5px] font-bold hover:translate-y-[-1px] hover:shadow-[0_6px_20px_rgba(163,230,53,0.3)] active:translate-y-0 transition-all duration-200 cursor-pointer group">
                   <span>RUN AUDIT</span>
-                  <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2.5} />
+                  <ArrowRight
+                    className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5"
+                    strokeWidth={2.5}
+                  />
                 </button>
                 <button className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white text-neutral-800 px-6 py-3.5 text-[13.5px] font-semibold hover:bg-neutral-50 active:scale-98 transition-all duration-200 cursor-pointer shadow-sm">
                   <span>VIEW DEMO</span>
@@ -131,7 +133,6 @@ export default function App() {
 
             {/* Right Hero Visual Column (believable, minimal luxury SaaS dashboard) */}
             <div className="flex-1 relative w-full max-w-lg lg:max-w-xl aspect-[1.1/1] flex items-center justify-center select-none">
-              
               {/* Soft visual glow background */}
               <div className="absolute w-[80%] h-[80%] rounded-full bg-lime-300/10 blur-[90px] pointer-events-none" />
 
@@ -226,7 +227,9 @@ export default function App() {
                         fill="transparent"
                       />
                     </svg>
-                    <span className="absolute text-[12.5px] font-extrabold text-neutral-900">92</span>
+                    <span className="absolute text-[12.5px] font-extrabold text-neutral-900">
+                      92
+                    </span>
                   </div>
                   <div>
                     <div className="text-[12.5px] font-bold text-neutral-850 leading-none mb-1">
@@ -303,23 +306,27 @@ export default function App() {
                     <span className="text-lime-400 font-mono">const</span>{" "}
                     <span className="text-sky-300 font-mono">AuditBadge</span> = () =&gt; &#123;{" "}
                     <br />
-                    &nbsp;&nbsp;<span className="text-neutral-500 font-mono">{"// Fix contrast"}</span>{" "}
-                    <br />
+                    &nbsp;&nbsp;
+                    <span className="text-neutral-500 font-mono">{"// Fix contrast"}</span> <br />
                     &nbsp;&nbsp;<span className="text-lime-400 font-mono">return</span> (<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;<span className="text-sky-300 font-mono">div</span>{" "}
+                    &nbsp;&nbsp;&nbsp;&nbsp;&lt;<span className="text-sky-300 font-mono">
+                      div
+                    </span>{" "}
                     <span className="text-amber-300 font-mono">className</span>=
-                    <span className="text-lime-300 font-mono">"text-neutral-900"</span>&gt;<br />
+                    <span className="text-lime-300 font-mono">"text-neutral-900"</span>&gt;
+                    <br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <span className="text-neutral-250 font-mono">Secure Node</span>
                     <br />
                     &nbsp;&nbsp;&nbsp;&nbsp;&lt;/
-                    <span className="text-sky-300 font-mono">div</span>&gt;<br />
-                    &nbsp;&nbsp;);<br />
+                    <span className="text-sky-300 font-mono">div</span>&gt;
+                    <br />
+                    &nbsp;&nbsp;);
+                    <br />
                     &#125;;
                   </code>
                 </pre>
               </div>
-
             </div>
           </div>
         </main>

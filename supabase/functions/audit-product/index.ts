@@ -116,7 +116,13 @@ Deno.serve(async (req) => {
     try {
       parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
     } catch {
-      parsed = { trustScore: 0, summary: "Failed to parse audit", findings: [], codexFixes: [], raw };
+      parsed = {
+        trustScore: 0,
+        summary: "Failed to parse audit",
+        findings: [],
+        codexFixes: [],
+        raw,
+      };
     }
 
     return new Response(JSON.stringify(parsed), {

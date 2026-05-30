@@ -39,11 +39,11 @@ export type ScoredReport = RawAIReport & {
 // ---------------------------------------------------------------------------
 
 const WEIGHTS: Record<Category, number> = {
-  Security:      0.35,
+  Security: 0.35,
   Accessibility: 0.25,
-  UX:            0.25,
-  Privacy:       0.10,
-  Frontend:      0.05,
+  UX: 0.25,
+  Privacy: 0.1,
+  Frontend: 0.05,
 };
 
 // Deduction ranges per severity level calibrated for wider, believable scoring:
@@ -51,9 +51,9 @@ const WEIGHTS: Record<Category, number> = {
 // MEDIUM: 10-20 points deduction
 // LOW: 3-7 points deduction
 const DEDUCTIONS: Record<Severity, { min: number; max: number }> = {
-  HIGH:   { min: 25, max: 40 },
+  HIGH: { min: 25, max: 40 },
   MEDIUM: { min: 10, max: 20 },
-  LOW:    { min:  3, max:  7 },
+  LOW: { min: 3, max: 7 },
 };
 
 /**
@@ -168,11 +168,13 @@ const reportSchema = {
     properties: {
       summary: {
         type: "string",
-        description: "A 2–3 sentence executive summary of the interface audit. Be specific about what was observed.",
+        description:
+          "A 2–3 sentence executive summary of the interface audit. Be specific about what was observed.",
       },
       findings: {
         type: "array",
-        description: "All design, accessibility, security, privacy, and frontend findings. Return proportional to actual issues found — do not pad or omit.",
+        description:
+          "All design, accessibility, security, privacy, and frontend findings. Return proportional to actual issues found — do not pad or omit.",
         items: {
           type: "object",
           additionalProperties: false,
@@ -187,11 +189,21 @@ const reportSchema = {
             severity: {
               type: "string",
               enum: ["HIGH", "MEDIUM", "LOW"],
-              description: "HIGH = serious risk to users or security. MEDIUM = significant friction or partial compliance failure. LOW = minor polish issue.",
+              description:
+                "HIGH = serious risk to users or security. MEDIUM = significant friction or partial compliance failure. LOW = minor polish issue.",
             },
-            title: { type: "string", description: "Short, specific title naming the exact element or issue." },
-            description: { type: "string", description: "VISUAL OBSERVATION + WHY IT MATTERS + USER IMPACT." },
-            recommendation: { type: "string", description: "PRECISE FIX with engineering specifics." },
+            title: {
+              type: "string",
+              description: "Short, specific title naming the exact element or issue.",
+            },
+            description: {
+              type: "string",
+              description: "VISUAL OBSERVATION + WHY IT MATTERS + USER IMPACT.",
+            },
+            recommendation: {
+              type: "string",
+              description: "PRECISE FIX with engineering specifics.",
+            },
           },
         },
       },
@@ -205,7 +217,10 @@ const reportSchema = {
           properties: {
             title: { type: "string" },
             language: { type: "string", description: "e.g. 'tsx', 'css'" },
-            code: { type: "string", description: "Complete, production-grade code block — no placeholders." },
+            code: {
+              type: "string",
+              description: "Complete, production-grade code block — no placeholders.",
+            },
             explanation: { type: "string" },
           },
         },
@@ -401,7 +416,12 @@ export const Route = createFileRoute("/api/analyze")({
     handlers: {
       POST: async ({ request }) => {
         try {
-          const { imageBase64, url, mimeType, source = "url" } = (await request.json()) as {
+          const {
+            imageBase64,
+            url,
+            mimeType,
+            source = "url",
+          } = (await request.json()) as {
             imageBase64?: string;
             url?: string;
             mimeType?: string;
@@ -409,18 +429,22 @@ export const Route = createFileRoute("/api/analyze")({
           };
 
           if (!imageBase64 && !url) {
-            return new Response(
-              JSON.stringify({ error: "Provide imageBase64 or url" }),
-              { status: 400, headers: { "content-type": "application/json" } }
-            );
+            return new Response(JSON.stringify({ error: "Provide imageBase64 or url" }), {
+              status: 400,
+              headers: { "content-type": "application/json" },
+            });
           }
 
-          const apiKey = process.env.OPENROUTER_API_KEY || (import.meta.env as any).OPENROUTER_API_KEY;
-          const model = process.env.OPENROUTER_MODEL || (import.meta.env as any).OPENROUTER_MODEL || "openai/gpt-oss-20b:free";
+          const apiKey =
+            process.env.OPENROUTER_API_KEY || (import.meta.env as any).OPENROUTER_API_KEY;
+          const model =
+            process.env.OPENROUTER_MODEL ||
+            (import.meta.env as any).OPENROUTER_MODEL ||
+            "openai/gpt-oss-20b:free";
 
           if (isMissingApiKey(apiKey)) {
             console.log(
-              "ShieldUX: OPENROUTER_API_KEY not configured — serving computed mock report."
+              "ShieldUX: OPENROUTER_API_KEY not configured — serving computed mock report.",
             );
             await new Promise((resolve) => setTimeout(resolve, 1500));
             return new Response(JSON.stringify(mockReport), {
@@ -431,12 +455,14 @@ export const Route = createFileRoute("/api/analyze")({
           let userPrompt = "";
 
           if (imageBase64) {
-            userPrompt = "Audit this product screenshot end-to-end. Identify ALL issues proportional to the actual quality of the UI. Focus on login/signup flows, forms, and general design elements. Since this is a text-based request, perform a comprehensive cybersecurity, accessibility (WCAG 2.2), and UX audit based on typical SaaS interface patterns. Return strict JSON matching the schema — do not include a trustScore field.";
+            userPrompt =
+              "Audit this product screenshot end-to-end. Identify ALL issues proportional to the actual quality of the UI. Focus on login/signup flows, forms, and general design elements. Since this is a text-based request, perform a comprehensive cybersecurity, accessibility (WCAG 2.2), and UX audit based on typical SaaS interface patterns. Return strict JSON matching the schema — do not include a trustScore field.";
           } else {
             const sourceInstructions: Record<Exclude<AuditSource, "screenshot">, string> = {
               url: "Audit this live product URL based on its visible product UI patterns, conversion flow, accessibility, privacy cues, and security posture.",
               repo: "Audit this GitHub repository as a product engineering surface. Focus on frontend implementation quality, accessibility debt, security-sensitive patterns, privacy handling, dependency risk signals, and actionable Codex fixes that would improve the repo.",
-              figma: "Audit this Figma design file as a product design and handoff surface. Focus on visual hierarchy, WCAG-ready accessibility, security and privacy trust cues in the designed flows, component consistency, and developer handoff readiness.",
+              figma:
+                "Audit this Figma design file as a product design and handoff surface. Focus on visual hierarchy, WCAG-ready accessibility, security and privacy trust cues in the designed flows, component consistency, and developer handoff readiness.",
             };
             const instruction = sourceInstructions[source === "screenshot" ? "url" : source];
             userPrompt = `${instruction}\n\nAudit the product at this URL based on its common UI patterns: ${url}. Return strict JSON matching the schema — do not include a trustScore field.`;
@@ -445,7 +471,7 @@ export const Route = createFileRoute("/api/analyze")({
           const modelsToTry = [
             model,
             "google/gemma-2-9b-it:free",
-            "meta-llama/llama-3-8b-instruct:free"
+            "meta-llama/llama-3-8b-instruct:free",
           ];
 
           let apiRes: Response | null = null;
@@ -458,19 +484,19 @@ export const Route = createFileRoute("/api/analyze")({
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
-                  "Authorization": `Bearer ${apiKey}`,
+                  Authorization: `Bearer ${apiKey}`,
                 },
                 body: JSON.stringify({
                   model: currentModel,
                   messages: [
                     {
                       role: "system",
-                      content: "You are ShieldUX AI Auditor."
+                      content: "You are ShieldUX AI Auditor.",
                     },
                     {
                       role: "user",
-                      content: `${SYSTEM_PROMPT}\n\n${userPrompt}`
-                    }
+                      content: `${SYSTEM_PROMPT}\n\n${userPrompt}`,
+                    },
                   ],
                 }),
               });
@@ -495,7 +521,9 @@ export const Route = createFileRoute("/api/analyze")({
           }
 
           if (!apiRes || !apiRes.ok) {
-            throw new Error(`OpenRouter API Error: All models exhausted. Last error: ${lastErrorMsg}`);
+            throw new Error(
+              `OpenRouter API Error: All models exhausted. Last error: ${lastErrorMsg}`,
+            );
           }
 
           const apiData = await apiRes.json();
@@ -525,9 +553,7 @@ export const Route = createFileRoute("/api/analyze")({
           const rawReport = JSON.parse(content) as RawAIReport;
 
           // Compute scores server-side — AI is never trusted to self-score
-          const { categoryScores, trustScore } = computeScores(
-            rawReport.findings as Finding[]
-          );
+          const { categoryScores, trustScore } = computeScores(rawReport.findings as Finding[]);
 
           const scoredReport: ScoredReport = {
             ...rawReport,
@@ -539,15 +565,11 @@ export const Route = createFileRoute("/api/analyze")({
             headers: { "content-type": "application/json" },
           });
         } catch (err: unknown) {
-          const message =
-            err instanceof Error
-              ? err.message
-              : "OpenRouter API Error";
+          const message = err instanceof Error ? err.message : "OpenRouter API Error";
           console.error("ShieldUX audit error:", message);
-          return new Response(
-            JSON.stringify({ ...mockReport, errorInfo: message }),
-            { headers: { "content-type": "application/json" } }
-          );
+          return new Response(JSON.stringify({ ...mockReport, errorInfo: message }), {
+            headers: { "content-type": "application/json" },
+          });
         }
       },
     },
