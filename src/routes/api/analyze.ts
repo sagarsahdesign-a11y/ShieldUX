@@ -442,30 +442,60 @@ export const Route = createFileRoute("/api/analyze")({
             userPrompt = `${instruction}\n\nAudit the product at this URL based on its common UI patterns: ${url}. Return strict JSON matching the schema — do not include a trustScore field.`;
           }
 
-          const apiRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${apiKey}`,
-            },
-            body: JSON.stringify({
-              model: model,
-              messages: [
-                {
-                  role: "system",
-                  content: "You are ShieldUX AI Auditor."
-                },
-                {
-                  role: "user",
-                  content: `${SYSTEM_PROMPT}\n\n${userPrompt}`
-                }
-              ],
-            }),
-          });
+          const modelsToTry = [
+            model,
+            "google/gemma-2-9b-it:free",
+            "meta-llama/llama-3-8b-instruct:free"
+          ];
 
-          if (!apiRes.ok) {
-            const errBody = await apiRes.text();
-            throw new Error(`OpenRouter API Error: Status ${apiRes.status} (${apiRes.statusText || "Unknown"}) — Body: ${errBody}`);
+          let apiRes: Response | null = null;
+          let lastErrorMsg = "";
+
+          for (const currentModel of modelsToTry) {
+            try {
+              console.log(`ShieldUX: Attempting audit with model ${currentModel}...`);
+              apiRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": `Bearer ${apiKey}`,
+                },
+                body: JSON.stringify({
+                  model: currentModel,
+                  messages: [
+                    {
+                      role: "system",
+                      content: "You are ShieldUX AI Auditor."
+                    },
+                    {
+                      role: "user",
+                      content: `${SYSTEM_PROMPT}\n\n${userPrompt}`
+                    }
+                  ],
+                }),
+              });
+
+              if (apiRes.ok) {
+                break;
+              }
+
+              const errBody = await apiRes.text();
+              lastErrorMsg = `Model ${currentModel} returned status ${apiRes.status}: ${errBody}`;
+              console.warn(`ShieldUX model warning: ${lastErrorMsg}`);
+
+              if (apiRes.status === 429 || apiRes.status >= 500) {
+                continue;
+              } else {
+                throw new Error(lastErrorMsg);
+              }
+            } catch (err: any) {
+              lastErrorMsg = err.message || "Network Error";
+              console.warn(`ShieldUX connection issue with ${currentModel}: ${lastErrorMsg}`);
+            }
+          }
+
+          if (!apiRes || !apiRes.ok) {
+            throw new Error(`OpenRouter API Error: All models exhausted. Last error: ${lastErrorMsg}`);
           }
 
           const apiData = await apiRes.json();
