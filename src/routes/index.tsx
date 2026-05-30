@@ -861,13 +861,17 @@ function Index() {
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-[radial-gradient(circle,_rgba(163,230,53,0.22)_0%,_transparent_70%)] blur-3xl pointer-events-none z-0" />
 
             {/* Center Robot Hand Area (Wrapped in mix-blend-multiply div to force transparent background) */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 mix-blend-multiply">
+            <div 
+              style={{ mixBlendMode: "multiply" }}
+              className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 mix-blend-multiply"
+            >
               <video
                 autoPlay
                 muted
                 loop
                 playsInline
-                className="w-[115%] sm:w-[130%] max-w-none h-auto object-contain opacity-95 drop-shadow-[0_15px_40px_rgba(0,0,0,0.06)] filter contrast-[1.04] saturate-[0.98] transition-all duration-500 hover:scale-[1.02]"
+                style={{ mixBlendMode: "multiply" }}
+                className="w-[115%] sm:w-[130%] max-w-none h-auto object-contain opacity-95 mix-blend-multiply filter contrast-[1.04] saturate-[0.98] transition-all duration-500 hover:scale-[1.02]"
               >
                 <source
                   src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4"
