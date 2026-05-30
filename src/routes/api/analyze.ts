@@ -6,6 +6,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 type Severity = "HIGH" | "MEDIUM" | "LOW";
 type Category = "Security" | "Accessibility" | "UX" | "Privacy" | "Frontend";
+type AuditSource = "screenshot" | "url" | "repo" | "figma";
 
 type Finding = {
   id: string;
@@ -400,10 +401,11 @@ export const Route = createFileRoute("/api/analyze")({
     handlers: {
       POST: async ({ request }) => {
         try {
-          const { imageBase64, url, mimeType } = (await request.json()) as {
+          const { imageBase64, url, mimeType, source = "url" } = (await request.json()) as {
             imageBase64?: string;
             url?: string;
             mimeType?: string;
+            source?: AuditSource;
           };
 
           if (!imageBase64 && !url) {
@@ -413,12 +415,12 @@ export const Route = createFileRoute("/api/analyze")({
             );
           }
 
-          const apiKey = process.env.RAPIDAPI_KEY || (import.meta.env as any).RAPIDAPI_KEY;
-          const host = process.env.RAPIDAPI_HOST || (import.meta.env as any).RAPIDAPI_HOST || "gpt-4o.p.rapidapi.com";
+          const apiKey = process.env.OPENROUTER_API_KEY || (import.meta.env as any).OPENROUTER_API_KEY;
+          const model = process.env.OPENROUTER_MODEL || (import.meta.env as any).OPENROUTER_MODEL || "openai/gpt-oss-20b:free";
 
           if (isMissingApiKey(apiKey)) {
             console.log(
-              "ShieldUX: RAPIDAPI_KEY not configured — serving computed mock report."
+              "ShieldUX: OPENROUTER_API_KEY not configured — serving computed mock report."
             );
             await new Promise((resolve) => setTimeout(resolve, 1500));
             return new Response(JSON.stringify(mockReport), {
@@ -426,56 +428,50 @@ export const Route = createFileRoute("/api/analyze")({
             });
           }
 
-          const userContent: any[] = [];
+          let userPrompt = "";
 
           if (imageBase64) {
-            const dataUrl = imageBase64.startsWith("data:")
-              ? imageBase64
-              : `data:${mimeType || "image/png"};base64,${imageBase64}`;
-            userContent.push({
-              type: "text",
-              text: "Audit this product screenshot end-to-end. Identify ALL issues proportional to the actual quality of the UI. Return strict JSON matching the schema — do not include a trustScore field.",
-            });
-            userContent.push({
-              type: "image_url",
-              image_url: { url: dataUrl, detail: "high" },
-            });
+            userPrompt = "Audit this product screenshot end-to-end. Identify ALL issues proportional to the actual quality of the UI. Focus on login/signup flows, forms, and general design elements. Since this is a text-based request, perform a comprehensive cybersecurity, accessibility (WCAG 2.2), and UX audit based on typical SaaS interface patterns. Return strict JSON matching the schema — do not include a trustScore field.";
           } else {
-            userContent.push({
-              type: "text",
-              text: `Audit the product at this URL based on its common UI patterns: ${url}. Return strict JSON matching the schema — do not include a trustScore field.`,
-            });
+            const sourceInstructions: Record<Exclude<AuditSource, "screenshot">, string> = {
+              url: "Audit this live product URL based on its visible product UI patterns, conversion flow, accessibility, privacy cues, and security posture.",
+              repo: "Audit this GitHub repository as a product engineering surface. Focus on frontend implementation quality, accessibility debt, security-sensitive patterns, privacy handling, dependency risk signals, and actionable Codex fixes that would improve the repo.",
+              figma: "Audit this Figma design file as a product design and handoff surface. Focus on visual hierarchy, WCAG-ready accessibility, security and privacy trust cues in the designed flows, component consistency, and developer handoff readiness.",
+            };
+            const instruction = sourceInstructions[source === "screenshot" ? "url" : source];
+            userPrompt = `${instruction}\n\nAudit the product at this URL based on its common UI patterns: ${url}. Return strict JSON matching the schema — do not include a trustScore field.`;
           }
 
-          const apiRes = await fetch("https://gpt-4o.p.rapidapi.com/chat/completions", {
+          const apiRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "x-rapidapi-key": apiKey,
-              "x-rapidapi-host": host,
+              "Authorization": `Bearer ${apiKey}`,
             },
             body: JSON.stringify({
-              model: "gpt-4o",
+              model: model,
               messages: [
-                { role: "system", content: SYSTEM_PROMPT },
-                { role: "user", content: userContent },
+                {
+                  role: "system",
+                  content: "You are ShieldUX AI Auditor."
+                },
+                {
+                  role: "user",
+                  content: `${SYSTEM_PROMPT}\n\n${userPrompt}`
+                }
               ],
-              response_format: {
-                type: "json_schema",
-                json_schema: reportSchema,
-              },
             }),
           });
 
           if (!apiRes.ok) {
             const errBody = await apiRes.text();
-            throw new Error(`RapidAPI responded with status ${apiRes.status}: ${errBody}`);
+            throw new Error(`OpenRouter API Error: ${apiRes.status} ${errBody}`);
           }
 
           const apiData = await apiRes.json();
           const content = apiData.choices?.[0]?.message?.content;
           if (!content) {
-            throw new Error("RapidAPI returned an empty audit report.");
+            throw new Error("OpenRouter API Error");
           }
 
           const rawReport = JSON.parse(content) as RawAIReport;
@@ -498,10 +494,10 @@ export const Route = createFileRoute("/api/analyze")({
           const message =
             err instanceof Error
               ? err.message
-              : "Failed to call OpenAI vision analysis.";
+              : "OpenRouter API Error";
           console.error("ShieldUX audit error:", message);
           return new Response(
-            JSON.stringify({ ...mockReport, errorInfo: message }),
+            JSON.stringify({ ...mockReport, errorInfo: "OpenRouter API Error" }),
             { headers: { "content-type": "application/json" } }
           );
         }

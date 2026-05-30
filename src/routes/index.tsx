@@ -52,7 +52,8 @@ type AuditResult = {
   codexFixes: CodexFix[];
   errorInfo?: string;
 };
-type AuditTab = "screenshot" | "url";
+type AuditTab = "screenshot" | "url" | "repo" | "figma";
+type AuditSource = "screenshot" | "url" | "repo" | "figma";
 
 const sevStyles: Record<Severity, { bg: string; text: string; dot: string; border: string; label: string }> = {
   HIGH: { bg: "bg-red-500/10", text: "text-red-700", dot: "bg-red-500", border: "border-red-200/50", label: "High Risk" },
@@ -264,6 +265,8 @@ function Index() {
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [mimeType, setMimeType] = useState<string>("image/png");
   const [url, setUrl] = useState("");
+  const [repoUrl, setRepoUrl] = useState("");
+  const [figmaUrl, setFigmaUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [stageIdx, setStageIdx] = useState(0);
@@ -404,7 +407,7 @@ function Index() {
     reader.readAsDataURL(file);
   }, []);
 
-  const runAudit = async (payload: { imageBase64?: string; url?: string }) => {
+  const runAudit = async (payload: { imageBase64?: string; url?: string; source?: AuditSource }) => {
     setLoading(true);
     setResult(null);
     setProgress(8);
@@ -448,7 +451,7 @@ function Index() {
       setIsAuthModalOpen(true);
       return;
     }
-    runAudit({ imageBase64 });
+    runAudit({ imageBase64, source: "screenshot" });
   };
   const handleUrlAudit = () => {
     if (!url.trim()) return toast.error("Enter a URL");
@@ -458,7 +461,27 @@ function Index() {
       setIsAuthModalOpen(true);
       return;
     }
-    runAudit({ url });
+    runAudit({ url, source: "url" });
+  };
+  const handleRepoAudit = () => {
+    if (!repoUrl.trim()) return toast.error("Enter a GitHub repository URL");
+    if (!isAuthenticated) {
+      toast.info("Please sign in or continue as Guest to run the audit.");
+      setAuthView("signin");
+      setIsAuthModalOpen(true);
+      return;
+    }
+    runAudit({ url: repoUrl, source: "repo" });
+  };
+  const handleFigmaAudit = () => {
+    if (!figmaUrl.trim()) return toast.error("Enter a Figma file URL");
+    if (!isAuthenticated) {
+      toast.info("Please sign in or continue as Guest to run the audit.");
+      setAuthView("signin");
+      setIsAuthModalOpen(true);
+      return;
+    }
+    runAudit({ url: figmaUrl, source: "figma" });
   };
 
   return (
@@ -798,72 +821,48 @@ function Index() {
             </div>
           </div>
 
-          {/* Right Column - Premium real ShieldUX dashboard preview (NO medical/external components) */}
-          <div className="flex-1 relative w-full max-w-lg lg:max-w-xl aspect-[1.1/1] flex items-center justify-center select-none">
-            {/* Visual glow background */}
-            <div className="absolute w-[80%] h-[80%] rounded-full bg-lime-300/10 blur-[90px] pointer-events-none" />
+          {/* Right Column - floating layered hero composition */}
+          <div className="flex-1 relative w-full max-w-lg lg:max-w-xl min-h-[500px] sm:min-h-[560px] flex items-center justify-center select-none">
+            {/* Open-space intelligence field behind the hand */}
+            <div className="absolute inset-[-8%] rounded-full bg-[radial-gradient(circle_at_center,_rgba(190,242,100,0.22)_0%,_rgba(236,252,203,0.12)_28%,_rgba(255,255,255,0)_66%)] blur-2xl pointer-events-none" />
+            <div className="absolute inset-[8%] rounded-full border border-lime-300/20 bg-white/10 backdrop-blur-[2px] [mask-image:radial-gradient(circle_at_center,white,transparent_72%)] pointer-events-none" />
+            <div className="absolute inset-[4%] bg-[linear-gradient(rgba(16,185,129,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.045)_1px,transparent_1px)] bg-[size:44px_44px] opacity-70 [mask-image:radial-gradient(ellipse_at_center,white_0%,transparent_68%)] pointer-events-none" />
+            <div className="absolute left-1/2 top-1/2 h-[340px] w-[340px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-lime-500/18 animate-[spin_48s_linear_infinite] pointer-events-none" />
+            <div className="absolute left-1/2 top-1/2 h-[240px] w-[240px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-lime-500/14 pointer-events-none" />
+            <div className="absolute left-[14%] right-[8%] top-1/2 h-px bg-gradient-to-r from-transparent via-lime-500/20 to-transparent pointer-events-none" />
+            <div className="absolute bottom-[12%] top-[10%] left-1/2 w-px bg-gradient-to-b from-transparent via-sky-400/14 to-transparent pointer-events-none" />
+            <div className="absolute left-[18%] top-[20%] h-20 w-32 rounded-full border border-white/50 bg-white/20 blur-xl pointer-events-none" />
+            <div className="absolute bottom-[22%] right-[8%] h-24 w-36 rounded-full border border-lime-200/40 bg-lime-100/20 blur-xl pointer-events-none" />
 
-            {/* Dashboard Frame (Sleek minimalist browser mock) */}
-            <div className="w-[92%] aspect-[1.25/1] rounded-2xl border border-neutral-200/80 bg-white/60 backdrop-blur-md shadow-[0_15px_45px_rgba(0,0,0,0.03)] p-4 sm:p-5 relative overflow-hidden transition-all duration-300 hover:shadow-[0_25px_60px_rgba(0,0,0,0.05)]">
-              {/* Header browser-bar */}
-              <div className="flex items-center justify-between border-b border-neutral-100 pb-3 mb-4.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-neutral-200" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-neutral-200" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-neutral-200" />
-                  <span className="text-[9px] font-bold text-neutral-400 ml-2 uppercase tracking-widest font-mono">
-                    console.shieldux.sh
-                  </span>
-                </div>
-                <span className="text-[8.5px] font-bold px-2 py-0.5 rounded bg-lime-100/60 text-lime-800 border border-lime-200/40 uppercase tracking-wider font-mono">
-                  ACTIVE ENGINE
-                </span>
+            {/* Scanning HUD indicators */}
+            <div className="absolute inset-0 pointer-events-none z-20">
+              <div className="absolute top-[31%] left-[28%] flex items-center gap-1 rounded-md border border-neutral-200/80 bg-white/70 px-2 py-0.5 text-[8px] font-bold text-neutral-600 shadow-[0_8px_24px_rgba(15,23,42,0.04)] backdrop-blur-md">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                <span>AI_AUDIT_CORE</span>
               </div>
-
-              {/* Visual Tech Grid Behind the Hand */}
-              <div className="absolute inset-0 top-12 opacity-30 pointer-events-none z-0">
-                {/* Concentric cyber radar rings */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[220px] h-[220px] rounded-full border border-dashed border-lime-500/30 animate-[spin_40s_linear_infinite]" />
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[160px] h-[160px] rounded-full border border-lime-500/20" />
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[100px] h-[100px] rounded-full border border-lime-500/15" />
-                
-                {/* Tech crosshairs */}
-                <div className="absolute left-1/2 top-12 bottom-4 w-px bg-gradient-to-b from-transparent via-lime-500/20 to-transparent" />
-                <div className="absolute left-4 right-4 top-[55%] h-px bg-gradient-to-r from-transparent via-lime-500/20 to-transparent" />
+              <div className="absolute bottom-[26%] right-[23%] flex items-center gap-1 rounded-md border border-neutral-200/80 bg-white/70 px-2 py-0.5 text-[8px] font-bold text-neutral-600 shadow-[0_8px_24px_rgba(15,23,42,0.04)] backdrop-blur-md">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#0EA5E9] animate-pulse" />
+                <span>UX_TELEMETRY</span>
               </div>
-
-              {/* Scanning HUD indicators overlay */}
-              <div className="absolute inset-0 top-12 pointer-events-none z-20">
-                {/* Indicator tag 1 */}
-                <div className="absolute top-[28%] left-[24%] flex items-center gap-1 bg-white/80 backdrop-blur-sm px-2 py-0.5 rounded border border-neutral-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-[8px] font-bold text-neutral-600">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] animate-pulse" />
-                  <span>AI_AUDIT_CORE</span>
-                </div>
-
-                {/* Indicator tag 2 */}
-                <div className="absolute bottom-[26%] right-[18%] flex items-center gap-1 bg-white/80 backdrop-blur-sm px-2 py-0.5 rounded border border-neutral-200/80 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-[8px] font-bold text-neutral-600">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#0EA5E9] animate-pulse" />
-                  <span>UX_TELEMETRY</span>
-                </div>
-              </div>
-
-              {/* Minimal dashboard interface lines around/behind the hand */}
-              <div className="absolute bottom-4 left-5 right-5 flex justify-between text-[9px] font-mono text-neutral-450 z-20 pointer-events-none">
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-lime-500 animate-ping" />
-                  SYS_ACTIVE // PROD_INTEL
-                </span>
-                <span>telemetry_active: true</span>
+              <div className="absolute bottom-[12%] left-[18%] flex items-center gap-1 text-[9px] font-mono text-neutral-450">
+                <span className="w-1.5 h-1.5 rounded-full bg-lime-500 animate-ping" />
+                SYS_ACTIVE // PROD_INTEL
               </div>
             </div>
 
-            {/* Spotlight highlight behind the hand (Outside the blend div so it glows beautifully) */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-[radial-gradient(circle,_rgba(163,230,53,0.22)_0%,_transparent_70%)] blur-3xl pointer-events-none z-0" />
+            {/* Spotlight highlight behind the hand */}
+            <div className="absolute left-1/2 top-1/2 z-0 h-[310px] w-[310px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,_rgba(163,230,53,0.2)_0%,_transparent_70%)] blur-3xl pointer-events-none" />
 
             {/* Center Robot Hand Area (Wrapped in mix-blend-multiply div to force transparent background) */}
-            <div 
-              style={{ mixBlendMode: "multiply" }}
-              className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 mix-blend-multiply"
+            <div
+              style={{
+                mixBlendMode: "multiply",
+                WebkitMaskImage:
+                  "radial-gradient(ellipse 54% 66% at 58% 57%, black 34%, rgba(0,0,0,0.78) 48%, transparent 74%)",
+                maskImage:
+                  "radial-gradient(ellipse 54% 66% at 58% 57%, black 34%, rgba(0,0,0,0.78) 48%, transparent 74%)",
+              }}
+              className="absolute inset-0 z-10 flex items-center justify-center overflow-hidden pointer-events-none mix-blend-multiply"
             >
               <video
                 autoPlay
@@ -871,7 +870,7 @@ function Index() {
                 loop
                 playsInline
                 style={{ mixBlendMode: "multiply" }}
-                className="w-[115%] sm:w-[130%] max-w-none h-auto object-contain opacity-95 mix-blend-multiply filter contrast-[1.04] saturate-[0.98] transition-all duration-500 hover:scale-[1.02]"
+                className="w-[112%] sm:w-[120%] max-w-none h-auto object-contain opacity-95 mix-blend-multiply filter contrast-[1.05] saturate-[0.98] transition-all duration-500 hover:scale-[1.02]"
               >
                 <source
                   src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4"
@@ -881,7 +880,7 @@ function Index() {
             </div>
 
             {/* Floating Card 1 — Trust Score Card */}
-            <div className="absolute top-[8%] left-[-4%] w-[190px] rounded-xl border border-neutral-200/80 bg-white p-4.5 shadow-[0_12px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 group z-30">
+            <div className="absolute top-[2%] left-0 w-[172px] sm:top-[8%] sm:left-[1%] sm:w-[190px] rounded-xl border border-neutral-200/80 bg-white/92 p-4 sm:p-4.5 shadow-[0_18px_48px_rgba(15,23,42,0.08)] backdrop-blur-xl hover:shadow-[0_20px_54px_rgba(15,23,42,0.1)] hover:-translate-y-0.5 transition-all duration-300 group z-30">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">
                   Score telemetry
@@ -925,7 +924,7 @@ function Index() {
             </div>
 
             {/* Floating Card 2 — Findings Card */}
-            <div className="absolute bottom-[4%] right-[-5%] w-[240px] rounded-xl border border-neutral-200/80 bg-white p-4.5 shadow-[0_12px_32px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 z-30">
+            <div className="absolute bottom-0 right-0 w-[220px] sm:bottom-[4%] sm:w-[240px] rounded-xl border border-neutral-200/80 bg-white/92 p-4 sm:p-4.5 shadow-[0_18px_48px_rgba(15,23,42,0.08)] backdrop-blur-xl hover:shadow-[0_20px_54px_rgba(15,23,42,0.1)] hover:-translate-y-0.5 transition-all duration-300 z-30">
               <div className="flex items-center justify-between border-b border-neutral-100 pb-2.5 mb-2.5">
                 <span className="text-[9.5px] font-bold text-neutral-400 uppercase tracking-wider">
                   Security & UX Audit
@@ -973,7 +972,7 @@ function Index() {
             </div>
 
             {/* Floating Card 3 — Codex Fix Card */}
-            <div className="absolute top-[3%] right-[-8%] w-[215px] rounded-xl border border-neutral-800 bg-neutral-950 p-4 shadow-[0_12px_32px_rgba(0,0,0,0.12)] hover:-translate-y-0.5 transition-all duration-300 text-left font-mono z-30">
+            <div className="absolute top-[23%] right-0 w-[178px] sm:top-[3%] sm:w-[215px] rounded-xl border border-neutral-800 bg-neutral-950 p-3.5 sm:p-4 shadow-[0_18px_48px_rgba(0,0,0,0.16)] hover:-translate-y-0.5 transition-all duration-300 text-left font-mono z-30">
               <div className="flex items-center justify-between border-b border-neutral-850 pb-2 mb-2.5">
                 <div className="flex items-center gap-1.5">
                   <Code2 className="w-3.5 h-3.5 text-neutral-400" />
@@ -1073,8 +1072,8 @@ function Index() {
             Drop it. <span className="text-[#0EA5E9]">Ship it.</span>
           </h2>
           <p className="text-[15px] text-neutral-500 mb-10 max-w-lg">
-            Upload a screenshot of any login screen, dashboard or checkout. Get a full audit in
-            seconds.
+            Upload a screenshot, paste a URL, connect a GitHub repo, or review a Figma file. Get a
+            full audit in seconds.
           </p>
 
           <div className="bg-white border border-neutral-200 shadow-sm rounded-2xl overflow-hidden">
@@ -1084,34 +1083,23 @@ function Index() {
                 [
                   { id: "screenshot", icon: Upload, label: "Screenshot", soon: false },
                   { id: "url", icon: LinkIcon, label: "URL", soon: false },
-                  { id: "repo", icon: Github, label: "Repo", soon: true },
-                  { id: "figma", icon: Frame, label: "Figma", soon: true },
+                  { id: "repo", icon: Github, label: "Repo", soon: false },
+                  { id: "figma", icon: Frame, label: "Figma", soon: false },
                 ] as const
               ).map((t) => {
                 const active = tab === t.id;
-                const disabled = t.soon;
                 return (
                   <button
                     key={t.id}
-                    onClick={() => {
-                      if (!disabled && (t.id === "screenshot" || t.id === "url")) {
-                        setTab(t.id);
-                      }
-                    }}
-                    disabled={disabled}
+                    onClick={() => setTab(t.id)}
                     className={`flex-1 flex items-center justify-center gap-2 py-4 text-[12px] font-bold uppercase tracking-[0.8px] border-b-2 transition-colors cursor-pointer ${
                       active
                         ? "border-lime-500 text-neutral-900 bg-lime-50/10"
                         : "border-transparent text-neutral-400 hover:text-neutral-900"
-                    } ${disabled ? "opacity-40 cursor-not-allowed" : ""}`}
+                    }`}
                   >
                     <t.icon className="h-4 w-4" strokeWidth={2.5} />
                     {t.label}
-                    {t.soon && (
-                      <span className="ml-1 text-[8px] px-1.5 py-0.5 rounded bg-neutral-200 text-neutral-500">
-                        SOON
-                      </span>
-                    )}
                   </button>
                 );
               })}
@@ -1204,6 +1192,66 @@ function Index() {
                   </div>
                   <p className="text-[12px] text-neutral-500 mt-3">
                     Screenshots give richer multimodal results than URLs.
+                  </p>
+                </>
+              )}
+
+              {tab === "repo" && (
+                <>
+                  <label className="text-[10px] font-bold uppercase tracking-[1px] text-neutral-450 block mb-2">
+                    GitHub repository
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="relative flex-1">
+                      <Github className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" strokeWidth={2.5} />
+                      <input
+                        type="url"
+                        value={repoUrl}
+                        onChange={(e) => setRepoUrl(e.target.value)}
+                        placeholder="https://github.com/company/product"
+                        className="w-full h-11 pl-10 pr-4 rounded-xl border border-neutral-300 bg-white focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] outline-none text-[14px] font-semibold text-neutral-900 placeholder:text-neutral-400 transition-colors"
+                      />
+                    </div>
+                    <Btn variant="blue" onClick={handleRepoAudit} disabled={loading}>
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-white" strokeWidth={3} />
+                      ) : (
+                        "Audit repo"
+                      )}
+                    </Btn>
+                  </div>
+                  <p className="text-[12px] text-neutral-500 mt-3">
+                    Audits repository-facing product risks, frontend quality, accessibility debt, and security posture from the repo context.
+                  </p>
+                </>
+              )}
+
+              {tab === "figma" && (
+                <>
+                  <label className="text-[10px] font-bold uppercase tracking-[1px] text-neutral-450 block mb-2">
+                    Figma file
+                  </label>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <div className="relative flex-1">
+                      <Frame className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" strokeWidth={2.5} />
+                      <input
+                        type="url"
+                        value={figmaUrl}
+                        onChange={(e) => setFigmaUrl(e.target.value)}
+                        placeholder="https://www.figma.com/design/..."
+                        className="w-full h-11 pl-10 pr-4 rounded-xl border border-neutral-300 bg-white focus:border-[#0EA5E9] focus:ring-1 focus:ring-[#0EA5E9] outline-none text-[14px] font-semibold text-neutral-900 placeholder:text-neutral-400 transition-colors"
+                      />
+                    </div>
+                    <Btn variant="blue" onClick={handleFigmaAudit} disabled={loading}>
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-white" strokeWidth={3} />
+                      ) : (
+                        "Audit file"
+                      )}
+                    </Btn>
+                  </div>
+                  <p className="text-[12px] text-neutral-500 mt-3">
+                    Reviews design-system consistency, accessibility, UX friction, privacy cues, and handoff readiness from the Figma file link.
                   </p>
                 </>
               )}
@@ -1324,20 +1372,20 @@ function Index() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-display text-[17px] font-bold text-red-750 leading-none mb-1.5">
-                    API Provider Error (Demo Mode Enabled)
+                    OpenRouter API Error (Demo Mode Enabled)
                   </h4>
                   <p className="text-[13px] text-red-900/80 leading-relaxed font-semibold">
                     ShieldUX is running in{" "}
-                    <strong>Demo Mode (showing default mock report with 86 score)</strong> because
-                    the configured RapidAPI GPT-4o integration has an issue:
+                    <strong>Demo Mode (showing default mock report with 92 score)</strong> because
+                    the OpenRouter API integration has an issue:
                   </p>
                   <div className="mt-3 p-3 bg-white border border-red-200/50 rounded-xl font-mono text-[12px] text-red-750 break-all">
                     {result.errorInfo}
                   </div>
                   <p className="text-[12px] text-red-800/80 mt-3 leading-relaxed">
-                    <strong>How to fix:</strong> Please ensure your <code>RAPIDAPI_KEY</code> and{" "}
-                    <code>RAPIDAPI_HOST</code> in <code>d:\ShieldUX\shieldux\.env.local</code> are
-                    correct and active in your RapidAPI Dashboard.
+                    <strong>How to fix:</strong> Please ensure your <code>OPENROUTER_API_KEY</code> and{" "}
+                    <code>OPENROUTER_MODEL</code> in <code>d:\ShieldUX\shieldux\.env.local</code> are
+                    correctly configured.
                   </p>
                 </div>
               </div>

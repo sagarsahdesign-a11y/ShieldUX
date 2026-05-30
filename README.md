@@ -31,7 +31,7 @@ ShieldUX uses multimodal AI analysis to audit digital products and generate stru
 - React
 - Tailwind CSS
 - Supabase authentication
-- RapidAPI GPT-4o integration for AI analysis
+- OpenRouter API integration for AI analysis
 - AI-assisted development workflows
 
 ## How It Works
@@ -102,8 +102,8 @@ SUPABASE_PUBLISHABLE_KEY=
 Required for live AI analysis:
 
 ```bash
-RAPIDAPI_KEY=
-RAPIDAPI_HOST=gpt-4o.p.rapidapi.com
+OPENROUTER_API_KEY=
+OPENROUTER_MODEL=openai/gpt-oss-20b:free
 ```
 
 Optional for trusted server-only Supabase admin usage:
@@ -112,11 +112,11 @@ Optional for trusted server-only Supabase admin usage:
 SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-If `RAPIDAPI_KEY` is missing or configured as a placeholder, ShieldUX serves a computed demo report so the MVP remains demoable without exposing provider credentials.
+If `OPENROUTER_API_KEY` is missing or configured as a placeholder, ShieldUX serves a computed demo report so the MVP remains demoable without exposing provider credentials.
 
 ## Production Safety
 
 - Keep service-role and provider keys server-side only.
 - Use Vite-prefixed Supabase variables only for publishable client configuration.
-- Never expose RapidAPI or service-role secrets in browser code.
+- Never expose OpenRouter or service-role secrets in browser code.
 - Validate production environment variables before deployment.
