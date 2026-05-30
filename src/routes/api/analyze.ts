@@ -469,9 +469,27 @@ export const Route = createFileRoute("/api/analyze")({
           }
 
           const apiData = await apiRes.json();
-          const content = apiData.choices?.[0]?.message?.content;
+          let content = apiData.choices?.[0]?.message?.content;
           if (!content) {
             throw new Error("OpenRouter API Error");
+          }
+
+          content = content.trim();
+
+          // Robustly remove markdown code fences if present
+          if (content.startsWith("```")) {
+            const firstLineBreak = content.indexOf("\n");
+            const lastCodeFence = content.lastIndexOf("```");
+            if (firstLineBreak !== -1 && lastCodeFence !== -1 && lastCodeFence > firstLineBreak) {
+              content = content.substring(firstLineBreak, lastCodeFence).trim();
+            }
+          }
+
+          // Extract only the JSON object boundaries in case of conversational prefixes or suffixes
+          const firstBrace = content.indexOf("{");
+          const lastBrace = content.lastIndexOf("}");
+          if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+            content = content.substring(firstBrace, lastBrace + 1);
           }
 
           const rawReport = JSON.parse(content) as RawAIReport;
