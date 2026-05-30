@@ -832,25 +832,6 @@ function Index() {
                 <div className="absolute left-4 right-4 top-[55%] h-px bg-gradient-to-r from-transparent via-lime-500/20 to-transparent" />
               </div>
 
-              {/* Center Robot Hand Area */}
-              <div className="absolute inset-0 top-12 flex items-center justify-center pointer-events-none z-10">
-                {/* High-fidelity glowing spotlight behind the hand */}
-                <div className="absolute w-[180px] h-[180px] rounded-full bg-[radial-gradient(circle,_rgba(163,230,53,0.18)_0%,_transparent_70%)] blur-2xl" />
-                
-                <video
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="w-[62%] max-w-[240px] h-auto object-contain mix-blend-multiply opacity-95 drop-shadow-[0_10px_30px_rgba(0,0,0,0.06)] filter contrast-[1.02] saturate-[0.98] transition-all duration-500 hover:scale-105"
-                >
-                  <source
-                    src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4"
-                    type="video/mp4"
-                  />
-                </video>
-              </div>
-
               {/* Scanning HUD indicators overlay */}
               <div className="absolute inset-0 top-12 pointer-events-none z-20">
                 {/* Indicator tag 1 */}
@@ -874,6 +855,25 @@ function Index() {
                 </span>
                 <span>telemetry_active: true</span>
               </div>
+            </div>
+
+            {/* Spotlight highlight behind the hand (Outside the blend div so it glows beautifully) */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px] rounded-full bg-[radial-gradient(circle,_rgba(163,230,53,0.22)_0%,_transparent_70%)] blur-3xl pointer-events-none z-0" />
+
+            {/* Center Robot Hand Area (Wrapped in mix-blend-multiply div to force transparent background) */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 mix-blend-multiply">
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-[115%] sm:w-[130%] max-w-none h-auto object-contain opacity-95 drop-shadow-[0_15px_40px_rgba(0,0,0,0.06)] filter contrast-[1.04] saturate-[0.98] transition-all duration-500 hover:scale-[1.02]"
+              >
+                <source
+                  src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260508_215831_c6a8989c-d716-4d8d-8745-e972a2eec711.mp4"
+                  type="video/mp4"
+                />
+              </video>
             </div>
 
             {/* Floating Card 1 — Trust Score Card */}
