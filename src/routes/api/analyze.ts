@@ -465,7 +465,7 @@ export const Route = createFileRoute("/api/analyze")({
 
           if (!apiRes.ok) {
             const errBody = await apiRes.text();
-            throw new Error(`OpenRouter API Error: ${apiRes.status} ${errBody}`);
+            throw new Error(`OpenRouter API Error: Status ${apiRes.status} (${apiRes.statusText || "Unknown"}) — Body: ${errBody}`);
           }
 
           const apiData = await apiRes.json();
@@ -515,7 +515,7 @@ export const Route = createFileRoute("/api/analyze")({
               : "OpenRouter API Error";
           console.error("ShieldUX audit error:", message);
           return new Response(
-            JSON.stringify({ ...mockReport, errorInfo: "OpenRouter API Error" }),
+            JSON.stringify({ ...mockReport, errorInfo: message }),
             { headers: { "content-type": "application/json" } }
           );
         }
